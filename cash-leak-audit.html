@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cash Leak Audit — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+<style>
+  .expense-row { display: grid; grid-template-columns: 1fr 130px 36px; gap: .5rem; align-items: center; }
+  .expense-row button { background: none; border: 0; color: var(--critical); font-size: 1.2rem; cursor: pointer; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <span class="step-tag">Step 3 of 8</span>
+  <h1>Cash Leak Audit</h1>
+  <p class="intro">Cash leaks are small, recurring expenses that quietly drain profit. Individually they look harmless; together they erode your margin. List every recurring or notable monthly expense (pull your bank and card statements — or work from memory and treat it as an estimate). Most owners find $500–$3,000 a month they didn't know they were losing.</p>
+
+  <div id="form-error" hidden></div>
+
+  <form id="tool-form" class="tool-form" novalidate>
+    <fieldset>
+      <legend>Your monthly expenses — don't filter, just list them</legend>
+      <div id="expense-rows"></div>
+      <button type="button" id="add-row" class="btn secondary">+ Add expense</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Scope creep — work you delivered but never billed</legend>
+      <div class="field"><label for="unbilledHours">Unbilled hours in a typical month (0 if none)</label>
+        <input id="unbilledHours" name="unbilledHours" type="number" min="0" step="any" value="0"></div>
+      <div class="field"><label for="hourlyRate">Your billable hourly rate ($)</label>
+        <input id="hourlyRate" name="hourlyRate" type="number" min="0" step="any" value="0"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>The six leak zones (optional — anything here sharpens the audit)</legend>
+      <div class="field"><label for="gutFeeling">Gut check: where do you think the biggest leak is?</label>
+        <input id="gutFeeling" name="gutFeeling" maxlength="300"></div>
+      <div class="field"><label for="subscriptionsNote">Any card charges you don't recognize, or tools your team stopped using?</label>
+        <input id="subscriptionsNote" name="subscriptionsNote" maxlength="300"></div>
+      <div class="field"><label for="vendorsNote">Vendors you've been with 2+ years without renegotiating?</label>
+        <input id="vendorsNote" name="vendorsNote" maxlength="300"></div>
+      <div class="field"><label for="marketingNote">Ad or marketing spend where you can't name the return?</label>
+        <input id="marketingNote" name="marketingNote" maxlength="300"></div>
+      <div class="field"><label for="lateFeesNote">Recurring late fees, or card balances carrying interest?</label>
+        <input id="lateFeesNote" name="lateFeesNote" maxlength="300"></div>
+      <div class="field"><label for="unusedAssetsNote">Equipment, vehicles, space, or licenses not earning their keep?</label>
+        <input id="unusedAssetsNote" name="unusedAssetsNote" maxlength="300"></div>
+    </fieldset>
+
+    <div class="field">
+      <label for="email">Your email — to unlock your report</label>
+      <input id="email" name="email" type="email" required autocomplete="email">
+    </div>
+    <button class="btn" type="submit" data-label="Find my leaks">Find my leaks</button>
+    <p class="form-note">Free. Your numbers are used only to generate this report.</p>
+  </form>
+
+  <section id="report" class="report" hidden>
+    <div id="metrics"></div>
+    <div id="report-body"></div>
+    <div class="followup">
+      <h3>Ask about your report</h3>
+      <p id="fu-counter"></p>
+      <div id="fu-thread"></div>
+      <div class="fu-row">
+        <input id="fu-input" type="text" maxlength="500" placeholder="e.g. How do I renegotiate with my vendor?">
+        <button id="fu-send" class="btn">Ask</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script type="module">
+import { initTool, esc, money } from "./assets/js/tool-ui.js";
+
+const rowsEl = document.getElementById("expense-rows");
+
+function addRow(name = "", cost = "") {
+  if (rowsEl.children.length >= 40) return;
+  const row = document.createElement("div");
+  row.className = "expense-row";
+  row.innerHTML = `
+    <input type="text" class="exp-name" maxlength="60" placeholder="Expense name (e.g. CRM software)" value="${esc(name)}">
+    <input type="number" class="exp-cost" min="0" step="any" placeholder="$/month" value="${esc(cost)}">
+    <button type="button" title="Remove">✕</button>`;
+  row.querySelector("button").addEventListener("click", () => {
+    if (rowsEl.children.length > 1) row.remove();
+  });
+  rowsEl.appendChild(row);
+}
+for (let i = 0; i < 5; i++) addRow();
+document.getElementById("add-row").addEventListener("click", () => addRow());
+
+initTool({
+  toolId: "cash-leak-audit",
+  collect(form) {
+    const expenses = [...rowsEl.querySelectorAll(".expense-row")]
+      .map((r) => ({ name: r.querySelector(".exp-name").value.trim(), monthlyCost: r.querySelector(".exp-cost").value }))
+      .filter((e) => e.name || e.monthlyCost);
+    const data = { expenses };
+    for (const el of form.querySelectorAll("[name]")) if (el.name !== "email") data[el.name] = el.value;
+    return data;
+  },
+  renderMetrics(m) {
+    return `
+      <h2>Your leak, found</h2>
+      <div class="big-number status-critical">${money(m.totalMonthlyLeak)}/mo</div>
+      <p><strong>${money(m.annualizedLeak)} a year</strong> leaving without working for you.</p>
+      <table class="metric-table">
+        <tr><th>Essential spend</th><td class="num">${money(m.essentialTotal)}/mo</td></tr>
+        <tr><th>Optimizable spend</th><td class="num">${money(m.optimizableTotal)}/mo (est. savings ${money(m.optimizableSavings)}/mo)</td></tr>
+        <tr><th>Eliminatable spend</th><td class="num">${money(m.eliminatableTotal)}/mo</td></tr>
+        <tr><th>Scope creep (unbilled work)</th><td class="num">${money(m.scopeCreepLeak)}/mo</td></tr>
+      </table>`;
+  },
+  renderReport(r) {
+    const rows = r.classifications.map((c) => `
+      <tr><td>${esc(c.name)}</td><td class="bucket-${esc(c.bucket)}">${esc(c.bucket)}</td><td>${esc(c.reason)}</td></tr>`).join("");
+    const list = (items) => items.map((a) => `<li>${esc(a)}</li>`).join("");
+    return `
+      <h2>What the audit revealed</h2><p>${esc(r.observation)}</p>
+      <h2>Every expense, sorted</h2>
+      <table class="metric-table"><tr><th>Expense</th><th>Bucket</th><th>Why</th></tr>${rows}</table>
+      <h2>Your action list</h2>
+      <h3>This week — quick wins</h3><ul class="actions">${list(r.actions_week)}</ul>
+      <h3>This month — needs a conversation</h3><ul class="actions">${list(r.actions_month)}</ul>
+      <h3>This quarter — bigger decisions</h3><ul class="actions">${list(r.actions_quarter)}</ul>
+      ${r.scope_creep_note ? `<h2>About that unbilled work</h2><p>${esc(r.scope_creep_note)}</p>` : ""}
+      <p class="closing">${esc(r.closing)}</p>`;
+  },
+});
+</script>
+</body>
+</html>
