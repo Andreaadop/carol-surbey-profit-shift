@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monthly Dashboard — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <span class="step-tag">Step 2 of 8</span>
+  <h1>Monthly Dashboard</h1>
+  <p class="intro">Your monthly cash flow review: enter one month of numbers, get the five metrics that matter for a service business, three flags, three priority actions — and a one-page snapshot you can print, file, and compare month over month. Rough estimates are fine; don't let a missing number stop you.</p>
+
+  <div id="form-error" hidden></div>
+
+  <form id="tool-form" class="tool-form" novalidate>
+    <fieldset>
+      <legend>Your business</legend>
+      <div class="field"><label for="businessType">What type of work do you do?</label>
+        <input id="businessType" name="businessType" maxlength="80" required placeholder="e.g. water damage restoration"></div>
+      <div class="field"><label for="employees">Roughly how many employees? (optional)</label>
+        <input id="employees" name="employees" maxlength="20"></div>
+      <div class="field"><label for="month">Which month are we reviewing?</label>
+        <input id="month" name="month" maxlength="30" required placeholder="e.g. June 2026"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Revenue</legend>
+      <div class="field"><label for="revenue">Total revenue for the month ($)</label>
+        <input id="revenue" name="revenue" type="number" min="1" step="any" required></div>
+      <div class="field"><label for="outstanding">Of that, how much is still uncollected? ($)</label>
+        <input id="outstanding" name="outstanding" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="uninvoiced">Work done but not yet invoiced ($ — 0 if none)</label>
+        <input id="uninvoiced" name="uninvoiced" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Direct job costs</legend>
+      <div class="field"><label for="materialsSubsDisposal">Materials, subcontractors, disposal fees ($)</label>
+        <input id="materialsSubsDisposal" name="materialsSubsDisposal" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="fieldLabour">Field labour — crew doing the actual work ($)</label>
+        <input id="fieldLabour" name="fieldLabour" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="equipmentCompliance">Equipment rental, certification/compliance tied to jobs ($)</label>
+        <input id="equipmentCompliance" name="equipmentCompliance" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Overhead</legend>
+      <div class="field"><label for="fixedOverhead">Fixed overhead — rent, insurance, vehicles, equipment payments, software ($)</label>
+        <input id="fixedOverhead" name="fixedOverhead" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="adminPayroll">Admin/office payroll — staff not doing field work ($)</label>
+        <input id="adminPayroll" name="adminPayroll" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="ownerDraw">Your owner draw or salary this month ($)</label>
+        <input id="ownerDraw" name="ownerDraw" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="cardCharges">Business credit card charges this month ($ — 0 if none)</label>
+        <input id="cardCharges" name="cardCharges" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Cash position</legend>
+      <div class="field"><label for="cashBalance">Current cash balance, roughly ($)</label>
+        <input id="cashBalance" name="cashBalance" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="upcomingBills">Large bills due in the next 30 days ($ — loans, insurance, payroll, tax)</label>
+        <input id="upcomingBills" name="upcomingBills" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="overdueAR">Receivables overdue 45+ days ($)</label>
+        <input id="overdueAR" name="overdueAR" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>The context behind the numbers (optional — but this is where the story is)</legend>
+      <div class="field"><label for="openingPosition">What was your bank balance at the start of the month? Did you come in carrying a deficit?</label>
+        <textarea id="openingPosition" name="openingPosition" rows="2" maxlength="400"></textarea></div>
+      <div class="field"><label for="cashFeel">How did the month feel, cash-wise? Any moments you weren't sure payroll would clear?</label>
+        <textarea id="cashFeel" name="cashFeel" rows="2" maxlength="400"></textarea></div>
+      <div class="field"><label for="unusualOutflows">Any one-time or unusual payments this month?</label>
+        <textarea id="unusualOutflows" name="unusualOutflows" rows="2" maxlength="400"></textarea></div>
+    </fieldset>
+
+    <div class="field">
+      <label for="email">Your email — to unlock your report</label>
+      <input id="email" name="email" type="email" required autocomplete="email">
+    </div>
+    <button class="btn" type="submit" data-label="Run my monthly review">Run my monthly review</button>
+    <p class="form-note">Free. Your numbers are used only to generate this report.</p>
+  </form>
+
+  <section id="report" class="report" hidden>
+    <div id="metrics"></div>
+    <div id="report-body"></div>
+    <button id="print-btn" class="btn secondary" type="button">Print your snapshot</button>
+    <div class="followup">
+      <h3>Ask about your report</h3>
+      <p id="fu-counter"></p>
+      <div id="fu-thread"></div>
+      <div class="fu-row">
+        <input id="fu-input" type="text" maxlength="500" placeholder="e.g. Walk me through action #1">
+        <button id="fu-send" class="btn">Ask</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="snapshot" class="print-only"></section>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script type="module">
+import { initTool, esc } from "./assets/js/tool-ui.js";
+
+const ROWS = [
+  ["grossMargin", "Gross Margin", (v) => `${v}%`, "40–60%"],
+  ["netOperatingMargin", "Net Operating Margin", (v) => `${v}%`, "10–20%"],
+  ["ownerCompPct", "Owner Comp % of Revenue", (v) => `${v}%`, "5–30%"],
+  ["dso", "Days Sales Outstanding", (v) => `${v} days`, "&lt;45 days"],
+  ["cashRunway", "Cash Runway", (v) => `${v} months`, "3+ months"],
+];
+const ICON = { healthy: "✅", watch: "⚠️", critical: "🚨" };
+
+function metricsTable(m) {
+  const rows = ROWS.map(([k, label, fmt, bench]) => `
+    <tr><th>${label}</th>
+      <td class="num status-${m.status[k]}">${fmt(esc(m[k]))}</td>
+      <td>${ICON[m.status[k]]}</td><td>${bench}</td></tr>`).join("");
+  return `<table class="metric-table">
+    <tr><th>Metric</th><th>Result</th><th>Status</th><th>Benchmark</th></tr>${rows}</table>`;
+}
+
+let last = null;
+
+initTool({
+  toolId: "monthly-dashboard",
+  collect(form) {
+    const data = {};
+    for (const el of form.querySelectorAll("[name]")) if (el.name !== "email") data[el.name] = el.value;
+    return data;
+  },
+  renderMetrics(m) {
+    return `<h2>The numbers at a glance</h2>${metricsTable(m)}`;
+  },
+  renderReport(r) {
+    return `
+      <h2>What the numbers are telling you</h2><p>${esc(r.story)}</p>
+      <h2>3 flags</h2>
+      ${r.flags.map((f) => `<div class="flag"><h4>🚩 ${esc(f.title)}</h4><p>${esc(f.body)}</p></div>`).join("")}
+      <h2>3 priority actions</h2>
+      <ol class="actions">${r.actions.map((a) => `<li><strong>${esc(a.title)}</strong> — ${esc(a.instruction)}</li>`).join("")}</ol>
+      <h2>One question to sit with</h2><p class="closing">${esc(r.question)}</p>`;
+  },
+  onReady(report, metrics) {
+    last = { report, metrics };
+    const month = document.querySelector("[name=month]").value;
+    const businessType = document.querySelector("[name=businessType]").value;
+    document.getElementById("snapshot").innerHTML = `
+      <h1>Monthly Cash Snapshot</h1>
+      <p><em>${esc(businessType)} | ${esc(month)}</em><br>
+      <em>Generated by the Monthly Dashboard — The CEO Profit Shift</em></p>
+      <h2>Your numbers this month</h2>
+      ${metricsTable(metrics)}
+      <p style="font-size:.8rem">Status key: ✅ Healthy&nbsp; ⚠️ Watch&nbsp; 🚨 Critical</p>
+      <h2>What the numbers are telling you this month</h2>
+      <p>${esc(report.story)}</p>
+      <h2>3 things to watch before next review</h2>
+      <ol>${report.watch_items.map((w) => `<li>${esc(w)}</li>`).join("")}</ol>
+      <h2>Next review date</h2>
+      <p>${new Date(Date.now() + 30 * 86400e3).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+      <p style="font-size:.8rem"><em>A tool by Carol Surbey, professionally trained business coach and founder of The Scalable CEO · carolsurbey.com</em></p>`;
+  },
+});
+
+document.getElementById("print-btn").addEventListener("click", () => {
+  if (!last) return;
+  document.body.classList.add("print-snapshot");
+  window.print();
+  document.body.classList.remove("print-snapshot");
+});
+</script>
+</body>
+</html>
