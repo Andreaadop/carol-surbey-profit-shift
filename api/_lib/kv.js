@@ -26,13 +26,17 @@ class MemoryKV {
   }
   _persist() {
     if (!this.persistPath) return;
-    writeFileSync(
-      this.persistPath,
-      JSON.stringify({
-        map: Object.fromEntries(this.map),
-        lists: Object.fromEntries(this.lists),
-      })
-    );
+    try {
+      writeFileSync(
+        this.persistPath,
+        JSON.stringify({
+          map: Object.fromEntries(this.map),
+          lists: Object.fromEntries(this.lists),
+        })
+      );
+    } catch (err) {
+      console.warn("[kv] failed to persist dev store:", err?.message);
+    }
   }
   async incr(key) {
     const next = (this.map.get(key) ?? 0) + 1;
@@ -67,13 +71,7 @@ export function getKV() {
   let instance;
   if (url && token) {
     instance = new Redis({ url, token });
-  } else if (
-    process.env.VERCEL_ENV ||
-    process.env.VERCEL ||
-    // `vercel dev` does not reliably set VERCEL/VERCEL_ENV across CLI
-    // versions, but it does set NOW_REGION=dev1 for local dev invocations.
-    process.env.NOW_REGION === "dev1"
-  ) {
+  } else if (process.env.NOW_REGION === "dev1") {
     console.warn(
       "[kv] No Redis credentials — using in-memory store (dev only); state persists to .dev-kv.json"
     );
