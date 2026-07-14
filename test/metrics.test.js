@@ -114,3 +114,29 @@ test("cash leak totals: tolerant matching when Claude appends cost or changes ca
   assert.equal(t.optimizableTotal, 300);
   assert.equal(t.eliminatableTotal, 250);
 });
+
+test("cash leak totals: prefix collision does not steal another expense's bucket", () => {
+  const expenses = [
+    { name: "Truck insurance", monthlyCost: 900 },
+    { name: "Truck", monthlyCost: 100 },
+  ];
+  const classifications = [
+    { name: "Truck insurance: $900/month", bucket: "Essential" },
+    { name: "Truck: $100/month", bucket: "Eliminatable" },
+  ];
+  const t = computeCashLeakTotals(expenses, classifications, 0, 0);
+  assert.equal(t.essentialTotal, 900);
+  assert.equal(t.eliminatableTotal, 100);
+});
+
+test("cash leak totals: prefix match requires a word boundary", () => {
+  const expenses = [
+    { name: "Ads", monthlyCost: 50 },
+  ];
+  const classifications = [
+    { name: "Adsense subscription", bucket: "Essential" },
+  ];
+  const t = computeCashLeakTotals(expenses, classifications, 0, 0);
+  assert.equal(t.optimizableTotal, 50);
+  assert.equal(t.essentialTotal, 0);
+});

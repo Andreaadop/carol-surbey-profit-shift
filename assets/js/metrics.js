@@ -58,27 +58,52 @@ function normalizeName(s) {
   return String(s).trim().toLowerCase();
 }
 
-// Resolves an expense's bucket even when Claude's classification name doesn't
+// Resolves each expense's bucket even when Claude's classification name doesn't
 // match exactly (e.g. it appended the cost: "CRM subscription: $300/month").
-// Tries, in order: exact match, case-insensitive trimmed match, then a
-// classification whose normalized name starts with the expense's normalized
-// name. Falls back to Optimizable.
-function resolveBucket(expenseName, classifications, exactMap, normalizedMap) {
-  if (exactMap.has(expenseName)) return exactMap.get(expenseName);
-  const normalizedExpense = normalizeName(expenseName);
-  if (normalizedMap.has(normalizedExpense)) return normalizedMap.get(normalizedExpense);
-  for (const c of classifications) {
-    if (normalizeName(c.name).startsWith(normalizedExpense)) return c.bucket;
+// Two-pass, consuming resolver:
+//   Pass 1: exact (case-insensitive, trimmed) matches, each classification
+//           usable at most once.
+//   Pass 2: prefix-with-word-boundary matches (so "Ads" doesn't match
+//           "Adsense subscription"), longer expense names resolved first so
+//           e.g. "Truck insurance" claims its classification before the
+//           shorter "Truck" can prefix-steal it.
+// Falls back to Optimizable when nothing matches.
+function resolveBuckets(expenses, classifications) {
+  const buckets = new Map();
+  const used = new Set();
+  for (const e of expenses) {
+    const i = classifications.findIndex(
+      (c, idx) => !used.has(idx) && normalizeName(c.name) === normalizeName(e.name)
+    );
+    if (i >= 0) {
+      buckets.set(e.name, classifications[i].bucket);
+      used.add(i);
+    }
   }
-  return "Optimizable";
+  const byLengthDesc = [...expenses].sort((a, b) => b.name.length - a.name.length);
+  for (const e of byLengthDesc) {
+    if (buckets.has(e.name)) continue;
+    const ne = normalizeName(e.name);
+    const i = classifications.findIndex((c, idx) => {
+      if (used.has(idx)) return false;
+      const nc = normalizeName(c.name);
+      if (!nc.startsWith(ne)) return false;
+      const next = nc[ne.length];
+      return next === undefined || !/[a-z0-9]/.test(next);
+    });
+    if (i >= 0) {
+      buckets.set(e.name, classifications[i].bucket);
+      used.add(i);
+    }
+  }
+  return buckets;
 }
 
 export function computeCashLeakTotals(expenses, classifications, unbilledHours, hourlyRate) {
-  const bucketOf = new Map(classifications.map((c) => [c.name, c.bucket]));
-  const bucketOfNormalized = new Map(classifications.map((c) => [normalizeName(c.name), c.bucket]));
+  const buckets = resolveBuckets(expenses, classifications);
   const totals = { Essential: 0, Optimizable: 0, Eliminatable: 0 };
   for (const e of expenses) {
-    const bucket = resolveBucket(e.name, classifications, bucketOf, bucketOfNormalized);
+    const bucket = buckets.get(e.name) ?? "Optimizable";
     totals[bucket in totals ? bucket : "Optimizable"] += e.monthlyCost;
   }
   const optimizableSavings = totals.Optimizable * 0.25; // skill #3: 20–30% estimated reduction
