@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profit Margin Check — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <span class="step-tag">Step 1 of 8</span>
+  <h1>Profit Margin Check</h1>
+  <p class="intro">Most business owners are surprised by this number — what <em>feels</em> profitable and what <em>is</em> profitable are often very different things. Grab your last 3 months of financials (estimates are fine) and find out in 5 minutes.</p>
+
+  <div id="form-error" hidden></div>
+
+  <form id="tool-form" class="tool-form" novalidate>
+    <div class="field">
+      <label for="revenue">Total revenue — last 3 months ($)</label>
+      <input id="revenue" name="revenue" type="number" min="1" step="any" required>
+      <p class="hint">All money that came in, before any expenses.</p>
+    </div>
+    <div class="field">
+      <label for="cogs">Cost of Goods Sold — last 3 months ($)</label>
+      <input id="cogs" name="cogs" type="number" min="0" step="any" required>
+      <p class="hint">What you spend on specific jobs — field labor, subs, materials, disposal. If you didn't take the job, you wouldn't have spent it. Pure service with no delivery costs? Use 0.</p>
+    </div>
+    <div class="field">
+      <label for="opex">Operating expenses — last 3 months ($)</label>
+      <input id="opex" name="opex" type="number" min="0" step="any" required>
+      <p class="hint">What you pay whether you worked 10 jobs or 1 — software, rent, marketing, admin, insurance, vehicles.</p>
+    </div>
+    <div class="field">
+      <label for="ownerSalary">What you paid yourself — last 3 months ($)</label>
+      <input id="ownerSalary" name="ownerSalary" type="number" min="0" step="any" required>
+      <p class="hint">Salary or draws. Most owners leave this out — which makes the margin look better than it is. If it's 0, enter 0; we'll show you your corrected number.</p>
+    </div>
+    <div class="field">
+      <label for="email">Your email — to unlock your report</label>
+      <input id="email" name="email" type="email" required autocomplete="email">
+    </div>
+    <button class="btn" type="submit" data-label="Run my profit check">Run my profit check</button>
+    <p class="form-note">Free. Your numbers are used only to generate this report.</p>
+  </form>
+
+  <section id="report" class="report" hidden>
+    <div id="metrics"></div>
+    <div id="report-body"></div>
+    <div class="followup">
+      <h3>Ask about your report</h3>
+      <p id="fu-counter"></p>
+      <div id="fu-thread"></div>
+      <div class="fu-row">
+        <input id="fu-input" type="text" maxlength="500" placeholder="e.g. Which cost should I look at first?">
+        <button id="fu-send" class="btn">Ask</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script type="module">
+import { initTool, esc, money } from "./assets/js/tool-ui.js";
+
+initTool({
+  toolId: "profit-margin-check",
+  collect(form) {
+    const v = (n) => form.querySelector(`[name=${n}]`).value;
+    return { revenue: v("revenue"), cogs: v("cogs"), opex: v("opex"), ownerSalary: v("ownerSalary") };
+  },
+  renderMetrics(m) {
+    const band = (x) => x >= 20 ? "status-healthy" : x >= 10 ? "status-watch" : "status-critical";
+    let html = `
+      <h2>Your true profit margin</h2>
+      <div class="big-number ${band(m.margin)}">${esc(m.margin)}%</div>
+      <table class="metric-table">
+        <tr><th>True net profit (3 months)</th><td class="num">${money(m.trueNetProfit)}</td></tr>
+        <tr><th>True profit margin</th><td class="num ${band(m.margin)}">${esc(m.margin)}%</td></tr>`;
+    if (m.corrected) {
+      html += `
+        <tr><th>Corrected — with a market-rate salary of ${money(m.corrected.estimatedQuarterlySalary)}/quarter</th>
+            <td class="num ${band(m.corrected.margin)}">${esc(m.corrected.margin)}% (${money(m.corrected.trueNetProfit)})</td></tr>`;
+    }
+    html += `</table>`;
+    return html;
+  },
+  renderReport(r) {
+    return `
+      <h2>The read</h2><p>${esc(r.diagnosis)}</p>
+      <h2>Why it's what it is</h2><p>${esc(r.root_cause)}</p>
+      <h2>Your next step</h2><p>${esc(r.next_step)}</p>
+      <p class="closing">${esc(r.closing)}</p>`;
+  },
+});
+</script>
+</body>
+</html>
