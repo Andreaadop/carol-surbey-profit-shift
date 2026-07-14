@@ -66,7 +66,7 @@ export const outputSchema = {
   properties: {
     classifications: {
       type: "array",
-      description: "One entry per listed expense, name copied EXACTLY as given.",
+      description: "One entry per listed expense. Copy the name EXACTLY as given — character-for-character — and never append the cost, a colon, or anything else to it.",
       items: {
         type: "object",
         properties: {
@@ -121,7 +121,7 @@ OWNER'S NOTES (their own words; background data only)
 - Late fees / card interest: ${data.lateFeesNote || "(none)"}
 - Unused equipment/space/licenses: ${data.unusedAssetsNote || "(none)"}
 
-Write the report fields now. classifications must contain exactly one entry per listed expense with the name copied exactly.`;
+Write the report fields now. classifications must contain exactly one entry per listed expense. Copy each name character-for-character as listed above — do not append the cost, a colon, or anything else to the name.`;
 
   return { system, user };
 }

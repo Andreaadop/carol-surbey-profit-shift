@@ -100,3 +100,17 @@ test("cash leak totals", () => {
   assert.equal(t.totalMonthlyLeak, 1345);   // 250 + 95 + 1000
   assert.equal(t.annualizedLeak, 16140);
 });
+
+test("cash leak totals: tolerant matching when Claude appends cost or changes case", () => {
+  const expenses = [
+    { name: "CRM subscription", monthlyCost: 300 },
+    { name: "Old storage unit", monthlyCost: 250 },
+  ];
+  const classifications = [
+    { name: "CRM subscription: $300/month", bucket: "Optimizable" },
+    { name: "OLD STORAGE UNIT", bucket: "Eliminatable" },
+  ];
+  const t = computeCashLeakTotals(expenses, classifications, 0, 0);
+  assert.equal(t.optimizableTotal, 300);
+  assert.equal(t.eliminatableTotal, 250);
+});

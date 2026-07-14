@@ -54,11 +54,31 @@ export function computeDashboardMetrics({ revenue, outstanding, directCosts, ove
   return { ...values, status };
 }
 
+function normalizeName(s) {
+  return String(s).trim().toLowerCase();
+}
+
+// Resolves an expense's bucket even when Claude's classification name doesn't
+// match exactly (e.g. it appended the cost: "CRM subscription: $300/month").
+// Tries, in order: exact match, case-insensitive trimmed match, then a
+// classification whose normalized name starts with the expense's normalized
+// name. Falls back to Optimizable.
+function resolveBucket(expenseName, classifications, exactMap, normalizedMap) {
+  if (exactMap.has(expenseName)) return exactMap.get(expenseName);
+  const normalizedExpense = normalizeName(expenseName);
+  if (normalizedMap.has(normalizedExpense)) return normalizedMap.get(normalizedExpense);
+  for (const c of classifications) {
+    if (normalizeName(c.name).startsWith(normalizedExpense)) return c.bucket;
+  }
+  return "Optimizable";
+}
+
 export function computeCashLeakTotals(expenses, classifications, unbilledHours, hourlyRate) {
   const bucketOf = new Map(classifications.map((c) => [c.name, c.bucket]));
+  const bucketOfNormalized = new Map(classifications.map((c) => [normalizeName(c.name), c.bucket]));
   const totals = { Essential: 0, Optimizable: 0, Eliminatable: 0 };
   for (const e of expenses) {
-    const bucket = bucketOf.get(e.name) ?? "Optimizable";
+    const bucket = resolveBucket(e.name, classifications, bucketOf, bucketOfNormalized);
     totals[bucket in totals ? bucket : "Optimizable"] += e.monthlyCost;
   }
   const optimizableSavings = totals.Optimizable * 0.25; // skill #3: 20–30% estimated reduction
