@@ -61,6 +61,10 @@ export function initTool({ toolId, collect, renderMetrics, renderReport, onReady
         showError(errorBox, "Check your inputs: " + Object.values(body.errors)[0]);
         return;
       }
+      if (res.status === 422) {
+        showError(errorBox, "That's more than this report can cover in one run — trim the list to the biggest items and run it again.");
+        return;
+      }
       if (!res.ok) {
         showError(errorBox, "Your report couldn't be generated — your numbers are saved. Try again in a minute.");
         return;

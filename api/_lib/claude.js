@@ -9,8 +9,9 @@ function getClient() {
   return client;
 }
 
-function firstText(msg) {
+export function firstText(msg) {
   if (msg.stop_reason === "refusal") throw new Error("model_refusal");
+  if (msg.stop_reason === "max_tokens") throw new Error("output_truncated");
   const block = msg.content.find((b) => b.type === "text");
   if (!block) throw new Error("no_text_block");
   return block.text;

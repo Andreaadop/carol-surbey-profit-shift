@@ -71,6 +71,8 @@ export function getKV() {
   let instance;
   if (url && token) {
     instance = new Redis({ url, token });
+  } else if (process.env.VERCEL_ENV === "production") {
+    throw new Error("KV credentials missing in production — configure KV_REST_API_URL/KV_REST_API_TOKEN");
   } else if (process.env.NOW_REGION === "dev1") {
     console.warn(
       "[kv] No Redis credentials — using in-memory store (dev only); state persists to .dev-kv.json"

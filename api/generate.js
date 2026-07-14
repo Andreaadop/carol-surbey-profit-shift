@@ -39,6 +39,9 @@ export default async function handler(req, res) {
     report = await generateStructured({ system, user, schema: tool.outputSchema, maxTokens: tool.maxTokens });
   } catch (err) {
     console.error(`[generate] ${toolId} failed:`, err?.message ?? err);
+    if (err?.message === "output_truncated") {
+      return res.status(422).json({ error: "report_too_long" });
+    }
     return res.status(502).json({ error: "generation_failed", retryable: true });
   }
 
