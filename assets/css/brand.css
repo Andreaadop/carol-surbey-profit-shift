@@ -71,6 +71,7 @@ legend { font-family: var(--serif); color: var(--navy); padding: 0 .4rem; font-s
 .metric-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
 .metric-table th, .metric-table td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid var(--light-sage); }
 .metric-table th { color: var(--navy); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+.metric-table .metric-plain { display: block; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: .78rem; color: var(--grey-light); }
 .metric-table .num { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--dark); }
 .status-healthy { color: var(--healthy); font-weight: 600; }
 .status-watch { color: var(--watch); font-weight: 600; }

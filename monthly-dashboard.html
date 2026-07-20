@@ -88,9 +88,10 @@
     <div class="field">
       <label for="email">Your email — to unlock your report</label>
       <input id="email" name="email" type="email" required autocomplete="email">
+      <p class="hint">Your report appears right here on this page a few seconds after you hit the button — no email is sent.</p>
     </div>
     <button class="btn" type="submit" data-label="Run my monthly review">Run my monthly review</button>
-    <p class="form-note">Free. Your numbers are used only to generate this report.</p>
+    <p class="form-note">Free. Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
   </form>
 
   <section id="report" class="report" hidden>
@@ -119,17 +120,17 @@
 import { initTool, esc } from "./assets/js/tool-ui.js";
 
 const ROWS = [
-  ["grossMargin", "Gross Margin", (v) => `${v}%`, "40–60%"],
-  ["netOperatingMargin", "Net Operating Margin", (v) => `${v}%`, "10–20%"],
-  ["ownerCompPct", "Owner Comp % of Revenue", (v) => `${v}%`, "5–30%"],
-  ["dso", "Days Sales Outstanding", (v) => `${v} days`, "&lt;45 days"],
-  ["cashRunway", "Cash Runway", (v) => `${v} months`, "3+ months"],
+  ["grossMargin", "Gross Margin", "what's left of each dollar after paying for the job itself", (v) => `${v}%`, "40–60%"],
+  ["netOperatingMargin", "Net Operating Margin", "what's left after job costs AND overhead", (v) => `${v}%`, "10–20%"],
+  ["ownerCompPct", "Owner Pay % of Revenue", "how much of your revenue you actually paid yourself", (v) => `${v}%`, "5–30%"],
+  ["dso", "Days Sales Outstanding", "how many days you wait to get paid after the work is done", (v) => `${v} days`, "&lt;45 days"],
+  ["cashRunway", "Cash Runway", "how many months your cash would cover overhead if nothing came in", (v) => `${v} months`, "3+ months"],
 ];
 const ICON = { healthy: "✅", watch: "⚠️", critical: "🚨" };
 
 function metricsTable(m) {
-  const rows = ROWS.map(([k, label, fmt, bench]) => `
-    <tr><th>${label}</th>
+  const rows = ROWS.map(([k, label, plain, fmt, bench]) => `
+    <tr><th>${label}<br><span class="metric-plain">${plain}</span></th>
       <td class="num status-${m.status[k]}">${fmt(esc(m[k]))}</td>
       <td>${ICON[m.status[k]]}</td><td>${bench}</td></tr>`).join("");
   return `<table class="metric-table">
