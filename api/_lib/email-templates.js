@@ -47,7 +47,7 @@ function wrap(bodyRows) {
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background: #ffffff; border-radius: 14px; border: 1px solid ${LIGHT}; font-family: Arial, Helvetica, sans-serif;">
   <tr><td align="center" style="padding: 26px 28px 0;">
-    <img src="https://profit-shift-site.vercel.app/assets/brand/logo-email.png" width="123" height="44" alt="Carol Surbey — Coaching &amp; Consulting" style="display: block; margin: 0 auto; border: 0;">
+    <img src="https://assets.cdn.filesafe.space/GzqTMEz873YL4qtc5zto/media/140d4f5c-d535-493c-9f5f-d87a6c64f025.png" width="123" height="44" alt="Carol Surbey — Coaching &amp; Consulting" style="display: block; margin: 0 auto; border: 0;">
     <div style="font-size: 11px; letter-spacing: .22em; color: ${TEAL}; text-transform: uppercase; margin-top: 8px;">The CEO Profit Shift</div>
   </td></tr>
   ${bodyRows}
