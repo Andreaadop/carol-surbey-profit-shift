@@ -48,13 +48,18 @@ function showError(container, message) {
   container.hidden = false;
 }
 
-// Sticky progress bar: sections are the form's fieldsets; one is complete
-// when every required field inside is non-empty and valid.
+// Sticky progress bar: sections are the form's fieldsets that contain
+// required fields; one is complete when every required field inside is
+// non-empty and valid. Optional-only fieldsets don't count toward progress
+// (otherwise a fully-filled form could never reach 100%), and the bar only
+// appears when there are at least two countable sections.
 function initProgress(form) {
   const mount = document.getElementById("form-progress");
   if (!mount) return { hide() {} };
-  const sections = [...form.querySelectorAll("fieldset")];
-  if (!sections.length) { mount.hidden = true; return { hide() {} }; }
+  const sections = [...form.querySelectorAll("fieldset")]
+    .map((fs) => ({ fs, required: [...fs.querySelectorAll("[required]")] }))
+    .filter((s) => s.required.length > 0);
+  if (sections.length < 2) { mount.hidden = true; return { hide() {} }; }
   mount.innerHTML = `
     <div class="progress-bar"><span></span></div>
     <span class="progress-label"></span>`;
@@ -62,10 +67,8 @@ function initProgress(form) {
   const label = mount.querySelector(".progress-label");
   const update = () => {
     let complete = 0;
-    for (const fs of sections) {
-      const required = [...fs.querySelectorAll("[required]")];
-      const ok = required.length > 0 &&
-        required.every((el) => el.value.trim() !== "" && el.checkValidity());
+    for (const { fs, required } of sections) {
+      const ok = required.every((el) => el.value.trim() !== "" && el.checkValidity());
       fs.classList.toggle("complete", ok);
       if (ok) complete++;
     }
