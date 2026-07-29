@@ -95,7 +95,7 @@
       </div>
     </fieldset>
     <button class="btn" type="submit" data-label="Run my monthly review">Run my monthly review</button>
-    <p class="form-note">Free. Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
+    <p class="form-note">Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
   </form>
 
   <section id="report" class="report" hidden>
@@ -122,6 +122,8 @@
 
 <script type="module">
 import { initTool, esc, money, flowBar } from "./assets/js/tool-ui.js";
+import { initGate } from "./assets/js/member-gate.js";
+initGate();
 
 const ROWS = [
   ["grossMargin", "Gross Margin", "what's left of each dollar after paying for the job itself", (v) => `${v}%`, "40–60%"],

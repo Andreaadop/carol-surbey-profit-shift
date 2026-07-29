@@ -152,6 +152,23 @@ fieldset.complete legend::before { content: "✓"; background: var(--sage); colo
 .flow-note { font-size: .8rem; color: var(--grey-light); margin-top: .6rem; }
 .card .flow { margin-top: 1.2rem; }
 .email-note { background: var(--mint); border-color: #d3e9e7; padding: .85rem 1.2rem; font-size: .92rem; color: var(--navy); font-weight: 600; }
+
+/* Members-only lock */
+.lock-card { background: var(--white); border: 1px solid var(--light-sage); border-radius: var(--radius); box-shadow: var(--shadow-card); padding: 1.8rem 1.8rem 1.6rem; max-width: 560px; display: grid; gap: .9rem; justify-items: start; }
+.lock-card .lock-head { font-family: var(--serif); font-size: 1.4rem; color: var(--navy); }
+.lock-card .btn { text-decoration: none; }
+.lock-divider { font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--grey-light); margin-top: .4rem; }
+.lock-card .fu-row { width: 100%; }
+.lock-expired { color: var(--watch); font-size: .88rem; }
+.signed-in { display: inline-block; background: #e7f2ea; color: var(--healthy); font-size: .82rem; font-weight: 600; border-radius: 999px; padding: .25rem .8rem; margin-bottom: 1rem; }
+
+/* Landing pricing */
+.price-card { background: var(--white); border: 2px solid var(--teal); border-radius: var(--radius); box-shadow: var(--shadow-lift); padding: 1.8rem; max-width: 520px; display: grid; gap: .7rem; justify-items: start; margin: 1.2rem 0 .4rem; }
+.price-amount { font-family: var(--serif); font-size: 2.6rem; color: var(--navy); line-height: 1; }
+.price-amount small { font-size: 1rem; color: var(--grey-light); font-family: var(--sans); }
+.price-card ul { margin: 0 0 .3rem 1.1rem; font-size: .95rem; }
+.price-card .btn { text-decoration: none; }
+.badge.members { color: var(--teal); background: var(--mint); padding: .18rem .6rem; border-radius: 999px; }
 .reveal { animation: rise .5s ease-out both; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .hero-stat { background: radial-gradient(120% 90% at 50% 0%, var(--mint) 0%, var(--white) 70%); border: 1px solid var(--light-sage); border-radius: var(--radius); box-shadow: var(--shadow-card); text-align: center; padding: 2rem 1.5rem 1.6rem; }

@@ -53,3 +53,49 @@ export async function sendEmail({ contactId, subject, html }) {
   if (process.env.GHL_EMAIL_FROM) body.emailFrom = process.env.GHL_EMAIL_FROM;
   return ghl("/conversations/messages", body);
 }
+
+async function ghlGet(path) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), CALL_TIMEOUT_MS);
+  try {
+    const res = await fetch(BASE + path, {
+      headers: {
+        Authorization: `Bearer ${process.env.GHL_API_KEY}`,
+        Version: "2021-07-28",
+        Accept: "application/json",
+      },
+      signal: ctl.signal,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(`GHL GET ${path} -> ${res.status}: ${JSON.stringify(data).slice(0, 200)}`);
+    }
+    return data;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Upsert WITHOUT tagging — immediate (no search-index lag) way to resolve a
+// contact id + current tags for an email. Creates a bare contact when new.
+export async function findOrCreateContact(email) {
+  const data = await ghl("/contacts/upsert", {
+    locationId: process.env.GHL_LOCATION_ID,
+    email,
+  });
+  const contact = data.contact ?? data;
+  let tags = contact.tags;
+  if (!Array.isArray(tags) && contact.id) {
+    const full = await ghlGet(`/contacts/${contact.id}`);
+    tags = full.contact?.tags ?? [];
+  }
+  return { id: contact.id, tags: Array.isArray(tags) ? tags : [] };
+}
+
+export async function listSubscriptions(contactId) {
+  const loc = process.env.GHL_LOCATION_ID;
+  const data = await ghlGet(
+    `/payments/subscriptions?altId=${encodeURIComponent(loc)}&altType=location&contactId=${encodeURIComponent(contactId)}&limit=20`
+  );
+  return Array.isArray(data.data) ? data.data : [];
+}

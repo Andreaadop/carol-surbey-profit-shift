@@ -4,7 +4,10 @@ import { generateStructured } from "./_lib/claude.js";
 import { TOOLS, EMAIL_RE, clientIp } from "./_lib/registry.js";
 import { ghlEnabled, upsertContact, sendEmail } from "./_lib/ghl.js";
 import { renderReportEmail, emailSubject } from "./_lib/email-templates.js";
+import { requireMember } from "./_lib/auth.js";
 import { randomUUID } from "node:crypto";
+
+const FREE_TOOLS = new Set(["profit-margin-check"]);
 
 const GENERATIONS_PER_EMAIL_PER_DAY = 3;
 const GENERATIONS_PER_IP_PER_DAY = 10;
@@ -25,6 +28,10 @@ export default async function handler(req, res) {
   if (parsed.errors) return res.status(400).json({ error: "invalid_input", errors: parsed.errors });
 
   const kv = getKV();
+  if (!FREE_TOOLS.has(toolId)) {
+    const auth = await requireMember(req, kv);
+    if (!auth.member) return res.status(403).json({ error: "members_only" });
+  }
   const day = new Date().toISOString().slice(0, 10);
   if (!(await underLimit(kv, `rl:email:${cleanEmail}:${day}`, GENERATIONS_PER_EMAIL_PER_DAY))) {
     return res.status(429).json({ error: "rate_limited" });

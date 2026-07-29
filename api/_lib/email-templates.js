@@ -143,6 +143,23 @@ export function renderReportEmail(toolId, data, metrics, report) {
 // user-typed text so nothing header-breaking can pass through to GHL.
 const headerSafe = (s) => [...String(s ?? "")].map((ch) => (ch.charCodeAt(0) < 32 || ch.charCodeAt(0) === 127 ? " " : ch)).join("").trim();
 
+export const MAGIC_LINK_SUBJECT = "Your CEO Profit Shift sign-in link";
+
+export function renderMagicLinkEmail(link) {
+  const safe = esc(link);
+  return wrap(`
+  <tr><td align="center" style="padding: 26px 28px 4px;">
+    <h2 style="margin:0; font-family: Georgia, serif; font-size: 22px; color: ${NAVY};">Sign in to your tools</h2>
+    <p style="margin: 10px 0 0; font-size: 15px; line-height: 1.65; color: ${GREY};">Click the button below to open the CEO Profit Shift tools on this device. The link works once and expires in 15 minutes.</p>
+  </td></tr>
+  <tr><td align="center" style="padding: 20px 28px 4px;">
+    <a href="${safe}" style="display: inline-block; background: ${NAVY}; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; padding: 14px 34px; border-radius: 999px;">Open my tools</a>
+  </td></tr>
+  <tr><td align="center" style="padding: 8px 28px 0;">
+    <p style="margin:0; font-size: 12px; color: ${GREY_LIGHT};">Didn't request this? You can safely ignore this email.</p>
+  </td></tr>`);
+}
+
 export function emailSubject(toolId, data, metrics) {
   if (toolId === "profit-margin-check") return `Your Profit Margin Check: ${metrics.margin}%`;
   if (toolId === "monthly-dashboard") return `Your Monthly Dashboard — ${headerSafe(data.month)}`;

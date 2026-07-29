@@ -62,6 +62,11 @@ class MemoryKV {
     const list = this.lists.get(key) ?? [];
     return list.slice(start, stop === -1 ? undefined : stop + 1);
   }
+  async del(key) {
+    const existed = this.map.delete(key);
+    this._persist();
+    return existed ? 1 : 0;
+  }
 }
 
 export function getKV() {
