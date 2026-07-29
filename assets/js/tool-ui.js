@@ -185,7 +185,9 @@ export function initTool({ toolId, collect, renderMetrics, renderReport, onReady
       }
       form.hidden = true;
       progress.hide();
-      document.getElementById("metrics").innerHTML = renderMetrics(body.metrics);
+      document.getElementById("metrics").innerHTML =
+        (body.emailed ? `<div class="card email-note">📬 A copy of this report is on its way to your inbox.</div>` : "") +
+        renderMetrics(body.metrics);
       document.getElementById("report-body").innerHTML = renderReport(body.report, body.metrics);
       reportSection.classList.add("reveal");
       reportSection.hidden = false;

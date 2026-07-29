@@ -2,6 +2,8 @@ import { getKV } from "./_lib/kv.js";
 import { underLimit } from "./_lib/ratelimit.js";
 import { generateStructured } from "./_lib/claude.js";
 import { TOOLS, EMAIL_RE, clientIp } from "./_lib/registry.js";
+import { ghlEnabled, upsertContact, sendEmail } from "./_lib/ghl.js";
+import { renderReportEmail, emailSubject } from "./_lib/email-templates.js";
 import { randomUUID } from "node:crypto";
 
 const GENERATIONS_PER_EMAIL_PER_DAY = 3;
@@ -54,5 +56,23 @@ export default async function handler(req, res) {
   );
   await kv.lpush("leads", { email: cleanEmail, toolId, ts: new Date().toISOString() });
 
-  return res.status(200).json({ sessionId, metrics: finalMetrics, report, followupsRemaining: FOLLOWUPS_PER_SESSION });
+  // Best-effort GHL capture + report email — must never fail the request.
+  let emailed = false;
+  if (ghlEnabled()) {
+    try {
+      const contactId = await upsertContact(cleanEmail, toolId);
+      if (contactId) {
+        await sendEmail({
+          contactId,
+          subject: emailSubject(toolId, parsed.data, finalMetrics),
+          html: renderReportEmail(toolId, parsed.data, finalMetrics, report),
+        });
+        emailed = true;
+      }
+    } catch (err) {
+      console.error("[ghl] email flow failed:", err?.message ?? err);
+    }
+  }
+
+  return res.status(200).json({ sessionId, metrics: finalMetrics, report, followupsRemaining: FOLLOWUPS_PER_SESSION, emailed });
 }

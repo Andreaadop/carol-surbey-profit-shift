@@ -151,6 +151,7 @@ fieldset.complete legend::before { content: "✓"; background: var(--sage); colo
 .flow-key em { font-style: normal; color: var(--grey-light); }
 .flow-note { font-size: .8rem; color: var(--grey-light); margin-top: .6rem; }
 .card .flow { margin-top: 1.2rem; }
+.email-note { background: var(--mint); border-color: #d3e9e7; padding: .85rem 1.2rem; font-size: .92rem; color: var(--navy); font-weight: 600; }
 .reveal { animation: rise .5s ease-out both; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .hero-stat { background: radial-gradient(120% 90% at 50% 0%, var(--mint) 0%, var(--white) 70%); border: 1px solid var(--light-sage); border-radius: var(--radius); box-shadow: var(--shadow-card); text-align: center; padding: 2rem 1.5rem 1.6rem; }
