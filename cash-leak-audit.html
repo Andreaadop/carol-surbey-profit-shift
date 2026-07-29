@@ -90,7 +90,7 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money, countUp } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp, flowBar } from "./assets/js/tool-ui.js";
 
 const rowsEl = document.getElementById("expense-rows");
 
@@ -121,40 +121,39 @@ initTool({
     return data;
   },
   renderMetrics(m) {
+    const bar = flowBar("Your monthly spend, sorted", [
+      { label: "Essential", value: m.essentialTotal, cls: "fs-green" },
+      { label: "Optimizable", value: m.optimizableTotal, cls: "fs-amber" },
+      { label: "Eliminatable", value: m.eliminatableTotal, cls: "fs-red" },
+      { label: "Scope creep (unbilled work)", value: m.scopeCreepLeak, cls: "fs-navy" },
+    ]);
     return `
-      <h2>Your leak, found</h2>
-      <div class="stat-grid" style="grid-template-columns: 1fr 1fr;">
-        <div class="hero-stat">
-          <div class="sub">Leaking every month</div>
-          <div class="big-number status-critical">$<span id="leak-month">0</span></div>
-          <div class="sub">per month</div>
-        </div>
-        <div class="hero-stat">
-          <div class="sub">That's a year of</div>
-          <div class="big-number status-critical">${money(m.annualizedLeak)}</div>
-        </div>
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Leaking every month</div>
+        <div class="big-number status-critical">$<span id="leak-month">0</span></div>
+        <div class="sub">per month</div>
       </div>
-      <table class="metric-table">
-        <tr><th>Essential spend</th><td class="num">${money(m.essentialTotal)}/mo</td></tr>
-        <tr><th>Optimizable spend</th><td class="num">${money(m.optimizableTotal)}/mo (est. savings ${money(m.optimizableSavings)}/mo)</td></tr>
-        <tr><th>Eliminatable spend</th><td class="num">${money(m.eliminatableTotal)}/mo</td></tr>
-        <tr><th>Scope creep (unbilled work)</th><td class="num">${money(m.scopeCreepLeak)}/mo</td></tr>
-      </table>`;
+      <div class="card sp-6 hero-stat">
+        <div class="sub">That's a year of</div>
+        <div class="big-number status-critical">${money(m.annualizedLeak)}</div>
+        <div class="sub">leaving without working for you</div>
+      </div>
+      ${bar ? `<div class="card">${bar}<p class="flow-note">Estimated ${money(m.optimizableSavings)}/mo back if optimizable costs are trimmed by a quarter.</p></div>` : ""}`;
   },
   renderReport(r) {
     const rows = r.classifications.map((c) => `
       <tr><td>${esc(c.name)}</td><td><span class="bucket-pill bucket-${esc(c.bucket)}">${esc(c.bucket)}</span></td><td>${esc(c.reason)}</td></tr>`).join("");
     const list = (items) => items.map((a) => `<li>${esc(a)}</li>`).join("");
     return `
-      <h2>What the audit revealed</h2><p>${esc(r.observation)}</p>
-      <h2>Every expense, sorted</h2>
-      <table class="metric-table"><tr><th>Expense</th><th>Bucket</th><th>Why</th></tr>${rows}</table>
-      <h2>Your action list</h2>
-      <h3>This week — quick wins</h3><ul class="actions">${list(r.actions_week)}</ul>
-      <h3>This month — needs a conversation</h3><ul class="actions">${list(r.actions_month)}</ul>
-      <h3>This quarter — bigger decisions</h3><ul class="actions">${list(r.actions_quarter)}</ul>
-      ${r.scope_creep_note ? `<h2>About that unbilled work</h2><p>${esc(r.scope_creep_note)}</p>` : ""}
-      <p class="closing">${esc(r.closing)}</p>`;
+      <div class="card sp-5"><h2>What the audit revealed</h2><p>${esc(r.observation)}</p></div>
+      <div class="card sp-7"><h2>Every expense, sorted</h2>
+        <table class="metric-table"><tr><th>Expense</th><th>Bucket</th><th>Why</th></tr>${rows}</table>
+      </div>
+      <div class="card sp-4 tint-mint"><h2>This week</h2><p class="flow-note" style="margin:0 0 .5rem">Quick wins</p><ul class="actions">${list(r.actions_week)}</ul></div>
+      <div class="card sp-4 tint-sage"><h2>This month</h2><p class="flow-note" style="margin:0 0 .5rem">Needs a conversation</p><ul class="actions">${list(r.actions_month)}</ul></div>
+      <div class="card sp-4 tint-amber"><h2>This quarter</h2><p class="flow-note" style="margin:0 0 .5rem">Bigger decisions</p><ul class="actions">${list(r.actions_quarter)}</ul></div>
+      ${r.scope_creep_note ? `<div class="card tint-amber"><h2>About that unbilled work</h2><p>${esc(r.scope_creep_note)}</p></div>` : ""}
+      <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {
     countUp(document.getElementById("leak-month"), Math.round(m.totalMonthlyLeak));

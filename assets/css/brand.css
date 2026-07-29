@@ -37,7 +37,7 @@ h1, h2, h3 { font-family: var(--serif); color: var(--navy); line-height: 1.12; f
 h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); letter-spacing: -0.01em; }
 h2 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); margin-bottom: .5rem; }
 a { color: var(--teal); }
-main { max-width: 880px; margin: 0 auto; padding: 2.5rem 1.25rem 4.5rem; }
+main { max-width: 1140px; margin: 0 auto; padding: 2.5rem 1.25rem 4.5rem; }
 
 .site-header { display: flex; align-items: center; gap: .9rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--light-sage); background: rgba(255,255,255,.7); }
 .site-header img { height: 44px; }
@@ -72,8 +72,9 @@ main { max-width: 880px; margin: 0 auto; padding: 2.5rem 1.25rem 4.5rem; }
 #form-progress.done { display: none; }
 
 /* Forms as numbered section cards */
-form.tool-form { display: grid; gap: 1.4rem; max-width: 620px; counter-reset: section; }
-fieldset { border: 1px solid var(--light-sage); border-radius: var(--radius); background: var(--white); box-shadow: var(--shadow-card); padding: 1.35rem 1.35rem 1.5rem; display: grid; gap: 1.1rem; counter-increment: section; }
+form.tool-form { display: grid; gap: 1.4rem; counter-reset: section; }
+fieldset { border: 1px solid var(--light-sage); border-radius: var(--radius); background: var(--white); box-shadow: var(--shadow-card); padding: 1.35rem 1.5rem 1.5rem; display: grid; gap: 1.1rem 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; counter-increment: section; }
+fieldset .field:has(textarea), fieldset .field:has([type=email]) { grid-column: 1 / -1; }
 legend { font-family: var(--serif); color: var(--navy); padding: 0 .5rem; font-size: 1.12rem; display: flex; align-items: center; gap: .55rem; }
 legend::before { content: counter(section); display: inline-flex; align-items: center; justify-content: center; width: 1.7rem; height: 1.7rem; border-radius: 999px; background: var(--mint); color: var(--teal); font: 700 .85rem var(--sans); transition: background .2s ease, color .2s ease; }
 fieldset.complete legend::before { content: "✓"; background: var(--sage); color: var(--white); }
@@ -103,8 +104,53 @@ fieldset.complete legend::before { content: "✓"; background: var(--sage); colo
 .loading-card .track::after { content: ""; position: absolute; inset: 0; width: 38%; border-radius: 999px; background: var(--grad-primary); animation: slide 1.4s ease-in-out infinite; }
 @keyframes slide { 0% { transform: translateX(-110%);} 100% { transform: translateX(290%);} }
 
-/* Report */
-.report { display: grid; gap: 1.75rem; }
+/* Report — bento grid */
+.report { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; }
+#metrics, #report-body { display: contents; }
+.report .card, .report .hero-stat, .report .stat-grid, .report .followup,
+.report .flag-note, .report .btn.secondary { grid-column: 1 / -1; }
+.report .btn.secondary { justify-self: start; }
+.card { background: var(--white); border: 1px solid var(--light-sage); border-radius: var(--radius); box-shadow: var(--shadow-card); padding: 1.5rem 1.6rem; }
+.card h2 { font-size: 1.3rem; margin-bottom: .65rem; }
+.tint-mint { background: var(--mint); border-color: #d3e9e7; }
+.tint-sage { background: #f3f6e9; border-color: #e2e8cf; }
+.tint-amber { background: #fdf7ec; border-color: #f0e2c6; }
+.tint-navy { background: #eef3f8; border-color: #d9e4ee; }
+.tint-navy .closing, .card .closing { border: 0; padding: 0; }
+.tint-amber .flag { background: var(--white); box-shadow: none; }
+@media (min-width: 900px) {
+  .report .sp-4 { grid-column: span 4; }
+  .report .sp-5 { grid-column: span 5; }
+  .report .sp-6 { grid-column: span 6; }
+  .report .sp-7 { grid-column: span 7; }
+  .report .sp-8 { grid-column: span 8; }
+}
+
+/* Gauge */
+.gauge-wrap { position: relative; max-width: 340px; margin: .5rem auto 0; }
+.gauge { display: block; width: 100%; }
+.g-critical { stroke: #f0d2d2; }
+.g-watch { stroke: #f0e0bd; }
+.g-healthy { stroke: #cde4d4; }
+.g-dot { fill: var(--navy); stroke: #fff; stroke-width: 3; }
+.gauge-num { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: clamp(2.4rem, 5vw, 3.2rem); }
+.gauge-caption { text-align: center; font-size: .78rem; color: var(--grey-light); margin: .4rem 0 1rem; }
+
+/* Flow bar (revenue / spend split) */
+.flow-title { font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--navy); }
+.flow-track { display: flex; gap: 2px; height: 18px; border-radius: 999px; overflow: hidden; margin: .8rem 0 .75rem; }
+.flow-seg { display: block; min-width: 5px; }
+.fs-navy { background: var(--navy); }
+.fs-teal { background: var(--teal); }
+.fs-sage { background: var(--sage-dark); }
+.fs-green { background: var(--healthy); }
+.fs-amber { background: var(--watch); }
+.fs-red { background: var(--critical); }
+.flow-legend { display: flex; flex-wrap: wrap; gap: .35rem 1.2rem; font-size: .84rem; color: var(--grey); }
+.flow-key i { display: inline-block; width: .68rem; height: .68rem; border-radius: 3px; margin-right: .4rem; vertical-align: -.06em; }
+.flow-key em { font-style: normal; color: var(--grey-light); }
+.flow-note { font-size: .8rem; color: var(--grey-light); margin-top: .6rem; }
+.card .flow { margin-top: 1.2rem; }
 .reveal { animation: rise .5s ease-out both; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .hero-stat { background: radial-gradient(120% 90% at 50% 0%, var(--mint) 0%, var(--white) 70%); border: 1px solid var(--light-sage); border-radius: var(--radius); box-shadow: var(--shadow-card); text-align: center; padding: 2rem 1.5rem 1.6rem; }
@@ -177,6 +223,15 @@ fieldset.complete legend::before { content: "✓"; background: var(--sage); colo
   body.print-snapshot main > *:not(.print-only) { display: none !important; }
   body.print-snapshot .print-only { display: block; }
   body { line-height: 1.45; }
+  /* Snapshot breathing room (kept to one page) */
+  #snapshot { padding: 0 .3in; }
+  #snapshot h1 { font-size: 20pt; margin-bottom: 6pt; }
+  #snapshot h2 { font-size: 12.5pt; margin: 13pt 0 5pt; }
+  #snapshot p { margin: 4pt 0; }
+  #snapshot ol { margin: 4pt 0 4pt 18pt; }
+  #snapshot li { margin-bottom: 3pt; }
+  #snapshot table { margin: 5pt 0; }
+  #snapshot th, #snapshot td { padding: 5pt 8pt; }
 }
 
 /* Reduced motion: collapse all animation */

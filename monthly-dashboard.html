@@ -121,7 +121,7 @@
 </footer>
 
 <script type="module">
-import { initTool, esc } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, flowBar } from "./assets/js/tool-ui.js";
 
 const ROWS = [
   ["grossMargin", "Gross Margin", "what's left of each dollar after paying for the job itself", (v) => `${v}%`, "40–60%"],
@@ -162,16 +162,28 @@ initTool({
     return data;
   },
   renderMetrics(m) {
-    return `<h2>The numbers at a glance</h2>${statCards(m)}`;
+    return statCards(m);
   },
   renderReport(r) {
+    const num = (n) => Number(document.querySelector(`[name=${n}]`)?.value) || 0;
+    const direct = num("materialsSubsDisposal") + num("fieldLabour") + num("equipmentCompliance");
+    const overhead = num("fixedOverhead") + num("adminPayroll");
+    const left = num("revenue") - direct - overhead - num("ownerDraw");
+    const bar = flowBar("Where this month's revenue went", [
+      { label: "Direct job costs", value: direct, cls: "fs-navy" },
+      { label: "Overhead", value: overhead, cls: "fs-teal" },
+      { label: "Your pay", value: num("ownerDraw"), cls: "fs-sage" },
+      { label: "Left in the business", value: left, cls: "fs-green" },
+    ]);
     return `
-      <h2>What the numbers are telling you</h2><p>${esc(r.story)}</p>
-      <h2>3 flags</h2>
-      ${r.flags.map((f) => `<div class="flag"><h4>🚩 ${esc(f.title)}</h4><p>${esc(f.body)}</p></div>`).join("")}
-      <h2>3 priority actions</h2>
-      <ol class="actions">${r.actions.map((a) => `<li><strong>${esc(a.title)}</strong> — ${esc(a.instruction)}</li>`).join("")}</ol>
-      <h2>One question to sit with</h2><p class="closing">${esc(r.question)}</p>`;
+      <div class="card sp-7"><h2>What the numbers are telling you</h2><p>${esc(r.story)}</p>${bar}</div>
+      <div class="card sp-5 tint-amber"><h2>3 flags</h2>
+        ${r.flags.map((f) => `<div class="flag"><h4>🚩 ${esc(f.title)}</h4><p>${esc(f.body)}</p></div>`).join("")}
+      </div>
+      <div class="card sp-7 tint-mint"><h2>3 priority actions</h2>
+        <ol class="actions">${r.actions.map((a) => `<li><strong>${esc(a.title)}</strong> — ${esc(a.instruction)}</li>`).join("")}</ol>
+      </div>
+      <div class="card sp-5 tint-navy"><h2>One question to sit with</h2><p class="closing">${esc(r.question)}</p></div>`;
   },
   onReady(report, metrics) {
     last = { report, metrics };

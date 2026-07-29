@@ -81,9 +81,10 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money, countUp } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp, flowBar, gaugeSVG } from "./assets/js/tool-ui.js";
 
 const band = (x) => x >= 20 ? "status-healthy" : x >= 10 ? "status-watch" : "status-critical";
+const formNum = (n) => Number(document.querySelector(`[name=${n}]`)?.value) || 0;
 
 initTool({
   toolId: "profit-margin-check",
@@ -92,28 +93,35 @@ initTool({
     return { revenue: v("revenue"), cogs: v("cogs"), opex: v("opex"), ownerSalary: v("ownerSalary") };
   },
   renderMetrics(m) {
-    let html = `
-      <div class="hero-stat">
-        <div class="sub">Your true profit margin</div>
-        <div id="margin-number" class="big-number ${band(m.margin)}">0%</div>
-      </div>
-      <table class="metric-table">
-        <tr><th>True net profit (3 months)</th><td class="num">${money(m.trueNetProfit)}</td></tr>
-        <tr><th>True profit margin</th><td class="num ${band(m.margin)}">${esc(m.margin)}%</td></tr>`;
-    if (m.corrected) {
-      html += `
-        <tr><th>Corrected — with a market-rate salary of ${money(m.corrected.estimatedQuarterlySalary)}/quarter</th>
-            <td class="num ${band(m.corrected.margin)}">${esc(m.corrected.margin)}% (${money(m.corrected.trueNetProfit)})</td></tr>`;
-    }
-    html += `</table>`;
-    return html;
-  },
-  renderReport(r) {
     return `
-      <h2>The read</h2><p>${esc(r.diagnosis)}</p>
-      <h2>Why it's what it is</h2><p>${esc(r.root_cause)}</p>
-      <h2>Your next step</h2><p>${esc(r.next_step)}</p>
-      <p class="closing">${esc(r.closing)}</p>`;
+      <div class="card sp-5">
+        <h2>Your true profit margin</h2>
+        <div class="gauge-wrap">
+          ${gaugeSVG(m.margin)}
+          <div id="margin-number" class="big-number gauge-num ${band(m.margin)}">0%</div>
+        </div>
+        <p class="gauge-caption">under 10% needs attention · 10–20% thin · 20%+ healthy</p>
+        <table class="metric-table">
+          <tr><th>True net profit (3 months)</th><td class="num">${money(m.trueNetProfit)}</td></tr>
+          ${m.corrected ? `
+          <tr><th>Corrected — with a market-rate salary of ${money(m.corrected.estimatedQuarterlySalary)}/quarter</th>
+              <td class="num ${band(m.corrected.margin)}">${esc(m.corrected.margin)}% (${money(m.corrected.trueNetProfit)})</td></tr>` : ""}
+        </table>
+      </div>`;
+  },
+  renderReport(r, m) {
+    const bar = flowBar("Where your revenue went", [
+      { label: "Job costs (COGS)", value: formNum("cogs"), cls: "fs-navy" },
+      { label: "Operating expenses", value: formNum("opex"), cls: "fs-teal" },
+      { label: "Your pay", value: formNum("ownerSalary"), cls: "fs-sage" },
+      { label: "Profit kept", value: m.trueNetProfit, cls: "fs-green" },
+    ]);
+    return `
+      <div class="card sp-7"><h2>The read</h2><p>${esc(r.diagnosis)}</p></div>
+      ${bar ? `<div class="card">${bar}</div>` : ""}
+      <div class="card sp-7 tint-mint"><h2>Why it's what it is</h2><p>${esc(r.root_cause)}</p></div>
+      <div class="card sp-5 tint-sage"><h2>Your next step</h2><p>${esc(r.next_step)}</p></div>
+      <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {
     countUp(document.getElementById("margin-number"), m.margin, { suffix: "%" });

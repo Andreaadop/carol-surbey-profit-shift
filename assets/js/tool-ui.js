@@ -28,6 +28,44 @@ export function countUp(el, value, { suffix = "", duration = 800 } = {}) {
   requestAnimationFrame(tick);
 }
 
+// Thin stacked bar splitting a total into labeled segments.
+// segments: [{label, value, cls}] — values must be >= 0; returns "" when the
+// data can't be shown honestly (zero/negative total or a negative segment).
+export function flowBar(title, segments) {
+  if (segments.some((s) => s.value < 0)) return "";
+  const total = segments.reduce((sum, s) => sum + s.value, 0);
+  if (!(total > 0)) return "";
+  const parts = segments.filter((s) => s.value > 0);
+  const track = parts.map((s) =>
+    `<span class="flow-seg ${s.cls}" style="width:${((s.value / total) * 100).toFixed(2)}%"></span>`).join("");
+  const legend = parts.map((s) =>
+    `<span class="flow-key"><i class="${s.cls}"></i>${esc(s.label)} · ${money(s.value)} <em>${Math.round((s.value / total) * 100)}%</em></span>`).join("");
+  return `<div class="flow">
+    <div class="flow-title">${esc(title)}</div>
+    <div class="flow-track">${track}</div>
+    <div class="flow-legend">${legend}</div>
+  </div>`;
+}
+
+// Semicircle gauge for the profit-margin bands: below 10% critical, 10–20%
+// watch, 20%+ healthy. Scale runs -5%..35%; the dot marks the actual value.
+export function gaugeSVG(value) {
+  const min = -5, max = 35, r = 80, cx = 100, cy = 100, sw = 16;
+  const pt = (v) => {
+    const a = ((Math.max(min, Math.min(max, v)) - min) / (max - min)) * Math.PI;
+    return [cx - r * Math.cos(a), cy - r * Math.sin(a)];
+  };
+  const band = (v1, v2, cls) => {
+    const [x1, y1] = pt(v1), [x2, y2] = pt(v2);
+    return `<path class="${cls}" d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+  };
+  const [dx, dy] = pt(Number(value) || 0);
+  return `<svg class="gauge" viewBox="0 0 200 112" role="img" aria-label="Profit margin gauge: below 10% needs attention, 10 to 20% thin, above 20% healthy">
+    ${band(min, 9.4, "g-critical")}${band(10.6, 19.4, "g-watch")}${band(20.6, max, "g-healthy")}
+    <circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="9" class="g-dot"/>
+  </svg>`;
+}
+
 function saveForm(toolId, form) {
   const data = {};
   for (const el of form.querySelectorAll("[name]")) data[el.name] = el.value;
