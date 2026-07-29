@@ -103,7 +103,7 @@
     <div id="report-body"></div>
     <button id="print-btn" class="btn secondary" type="button">Print your snapshot</button>
     <div class="followup">
-      <h3>Ask about your report</h3>
+      <h3>💬 Ask about your report</h3>
       <p id="fu-counter"></p>
       <div id="fu-thread"></div>
       <div class="fu-row">
@@ -169,21 +169,21 @@ initTool({
     const direct = num("materialsSubsDisposal") + num("fieldLabour") + num("equipmentCompliance");
     const overhead = num("fixedOverhead") + num("adminPayroll");
     const left = num("revenue") - direct - overhead - num("ownerDraw");
-    const bar = flowBar("Where this month's revenue went", [
+    const bar = flowBar("💸 Where this month's revenue went", [
       { label: "Direct job costs", value: direct, cls: "fs-navy" },
       { label: "Overhead", value: overhead, cls: "fs-teal" },
       { label: "Your pay", value: num("ownerDraw"), cls: "fs-sage" },
       { label: "Left in the business", value: left, cls: "fs-green" },
     ]);
     return `
-      <div class="card sp-7"><h2>What the numbers are telling you</h2><p>${esc(r.story)}</p>${bar}</div>
-      <div class="card sp-5 tint-amber"><h2>3 flags</h2>
+      <div class="card sp-7"><h2>🔍 What the numbers are telling you</h2><p>${esc(r.story)}</p>${bar}</div>
+      <div class="card sp-5 tint-amber"><h2>🚩 3 flags</h2>
         ${r.flags.map((f) => `<div class="flag"><h4>🚩 ${esc(f.title)}</h4><p>${esc(f.body)}</p></div>`).join("")}
       </div>
-      <div class="card sp-7 tint-mint"><h2>3 priority actions</h2>
+      <div class="card sp-7 tint-mint"><h2>🎯 3 priority actions</h2>
         <ol class="actions">${r.actions.map((a) => `<li><strong>${esc(a.title)}</strong> — ${esc(a.instruction)}</li>`).join("")}</ol>
       </div>
-      <div class="card sp-5 tint-navy"><h2>One question to sit with</h2><p class="closing">${esc(r.question)}</p></div>`;
+      <div class="card sp-5 tint-navy"><h2>🤔 One question to sit with</h2><p class="closing">${esc(r.question)}</p></div>`;
   },
   onReady(report, metrics) {
     last = { report, metrics };

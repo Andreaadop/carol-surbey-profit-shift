@@ -65,7 +65,7 @@
     <div id="metrics"></div>
     <div id="report-body"></div>
     <div class="followup">
-      <h3>Ask about your report</h3>
+      <h3>💬 Ask about your report</h3>
       <p id="fu-counter"></p>
       <div id="fu-thread"></div>
       <div class="fu-row">
@@ -95,7 +95,7 @@ initTool({
   renderMetrics(m) {
     return `
       <div class="card sp-5">
-        <h2>Your true profit margin</h2>
+        <h2>📊 Your true profit margin</h2>
         <div class="gauge-wrap">
           ${gaugeSVG(m.margin)}
           <div id="margin-number" class="big-number gauge-num ${band(m.margin)}">0%</div>
@@ -110,17 +110,17 @@ initTool({
       </div>`;
   },
   renderReport(r, m) {
-    const bar = flowBar("Where your revenue went", [
+    const bar = flowBar("💸 Where your revenue went", [
       { label: "Job costs (COGS)", value: formNum("cogs"), cls: "fs-navy" },
       { label: "Operating expenses", value: formNum("opex"), cls: "fs-teal" },
       { label: "Your pay", value: formNum("ownerSalary"), cls: "fs-sage" },
       { label: "Profit kept", value: m.trueNetProfit, cls: "fs-green" },
     ]);
     return `
-      <div class="card sp-7"><h2>The read</h2><p>${esc(r.diagnosis)}</p></div>
+      <div class="card sp-7"><h2>🔍 The read</h2><p>${esc(r.diagnosis)}</p></div>
       ${bar ? `<div class="card">${bar}</div>` : ""}
-      <div class="card sp-7 tint-mint"><h2>Why it's what it is</h2><p>${esc(r.root_cause)}</p></div>
-      <div class="card sp-5 tint-sage"><h2>Your next step</h2><p>${esc(r.next_step)}</p></div>
+      <div class="card sp-7 tint-mint"><h2>💡 Why it's what it is</h2><p>${esc(r.root_cause)}</p></div>
+      <div class="card sp-5 tint-sage"><h2>🎯 Your next step</h2><p>${esc(r.next_step)}</p></div>
       <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {

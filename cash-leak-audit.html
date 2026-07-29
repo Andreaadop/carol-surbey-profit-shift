@@ -74,7 +74,7 @@
     <div id="metrics"></div>
     <div id="report-body"></div>
     <div class="followup">
-      <h3>Ask about your report</h3>
+      <h3>💬 Ask about your report</h3>
       <p id="fu-counter"></p>
       <div id="fu-thread"></div>
       <div class="fu-row">
@@ -121,7 +121,7 @@ initTool({
     return data;
   },
   renderMetrics(m) {
-    const bar = flowBar("Your monthly spend, sorted", [
+    const bar = flowBar("💸 Your monthly spend, sorted", [
       { label: "Essential", value: m.essentialTotal, cls: "fs-green" },
       { label: "Optimizable", value: m.optimizableTotal, cls: "fs-amber" },
       { label: "Eliminatable", value: m.eliminatableTotal, cls: "fs-red" },
@@ -145,14 +145,14 @@ initTool({
       <tr><td>${esc(c.name)}</td><td><span class="bucket-pill bucket-${esc(c.bucket)}">${esc(c.bucket)}</span></td><td>${esc(c.reason)}</td></tr>`).join("");
     const list = (items) => items.map((a) => `<li>${esc(a)}</li>`).join("");
     return `
-      <div class="card sp-5"><h2>What the audit revealed</h2><p>${esc(r.observation)}</p></div>
-      <div class="card sp-7"><h2>Every expense, sorted</h2>
+      <div class="card sp-5"><h2>🔍 What the audit revealed</h2><p>${esc(r.observation)}</p></div>
+      <div class="card sp-7"><h2>🗂️ Every expense, sorted</h2>
         <table class="metric-table"><tr><th>Expense</th><th>Bucket</th><th>Why</th></tr>${rows}</table>
       </div>
-      <div class="card sp-4 tint-mint"><h2>This week</h2><p class="flow-note" style="margin:0 0 .5rem">Quick wins</p><ul class="actions">${list(r.actions_week)}</ul></div>
-      <div class="card sp-4 tint-sage"><h2>This month</h2><p class="flow-note" style="margin:0 0 .5rem">Needs a conversation</p><ul class="actions">${list(r.actions_month)}</ul></div>
-      <div class="card sp-4 tint-amber"><h2>This quarter</h2><p class="flow-note" style="margin:0 0 .5rem">Bigger decisions</p><ul class="actions">${list(r.actions_quarter)}</ul></div>
-      ${r.scope_creep_note ? `<div class="card tint-amber"><h2>About that unbilled work</h2><p>${esc(r.scope_creep_note)}</p></div>` : ""}
+      <div class="card sp-4 tint-mint"><h2>⚡ This week</h2><p class="flow-note" style="margin:0 0 .5rem">Quick wins</p><ul class="actions">${list(r.actions_week)}</ul></div>
+      <div class="card sp-4 tint-sage"><h2>📞 This month</h2><p class="flow-note" style="margin:0 0 .5rem">Needs a conversation</p><ul class="actions">${list(r.actions_month)}</ul></div>
+      <div class="card sp-4 tint-amber"><h2>🗓️ This quarter</h2><p class="flow-note" style="margin:0 0 .5rem">Bigger decisions</p><ul class="actions">${list(r.actions_quarter)}</ul></div>
+      ${r.scope_creep_note ? `<div class="card tint-amber"><h2>⏱️ About that unbilled work</h2><p>${esc(r.scope_creep_note)}</p></div>` : ""}
       <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {
