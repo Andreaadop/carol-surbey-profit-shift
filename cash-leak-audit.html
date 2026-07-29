@@ -25,6 +25,7 @@
   <p class="intro">Cash leaks are small, recurring expenses that quietly drain profit. Individually they look harmless; together they erode your margin. List every recurring or notable monthly expense (pull your bank and card statements — or work from memory and treat it as an estimate). Most owners find $500–$3,000 a month they didn't know they were losing.</p>
 
   <div id="form-error" hidden></div>
+  <div id="form-progress"></div>
 
   <form id="tool-form" class="tool-form" novalidate>
     <fieldset>
@@ -57,11 +58,14 @@
         <input id="unusedAssetsNote" name="unusedAssetsNote" maxlength="300"></div>
     </fieldset>
 
-    <div class="field">
-      <label for="email">Your email — to unlock your report</label>
-      <input id="email" name="email" type="email" required autocomplete="email">
-      <p class="hint">Your report appears right here on this page a few seconds after you hit the button — no email is sent.</p>
-    </div>
+    <fieldset>
+      <legend>Unlock your report</legend>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+        <p class="hint">Your report appears right here on this page a few seconds after you hit the button — no email is sent.</p>
+      </div>
+    </fieldset>
     <button class="btn" type="submit" data-label="Find my leaks">Find my leaks</button>
     <p class="form-note">Free. Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
   </form>
@@ -86,7 +90,7 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp } from "./assets/js/tool-ui.js";
 
 const rowsEl = document.getElementById("expense-rows");
 
@@ -119,8 +123,17 @@ initTool({
   renderMetrics(m) {
     return `
       <h2>Your leak, found</h2>
-      <div class="big-number status-critical">${money(m.totalMonthlyLeak)}/mo</div>
-      <p><strong>${money(m.annualizedLeak)} a year</strong> leaving without working for you.</p>
+      <div class="stat-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="hero-stat">
+          <div class="sub">Leaking every month</div>
+          <div class="big-number status-critical">$<span id="leak-month">0</span></div>
+          <div class="sub">per month</div>
+        </div>
+        <div class="hero-stat">
+          <div class="sub">That's a year of</div>
+          <div class="big-number status-critical">${money(m.annualizedLeak)}</div>
+        </div>
+      </div>
       <table class="metric-table">
         <tr><th>Essential spend</th><td class="num">${money(m.essentialTotal)}/mo</td></tr>
         <tr><th>Optimizable spend</th><td class="num">${money(m.optimizableTotal)}/mo (est. savings ${money(m.optimizableSavings)}/mo)</td></tr>
@@ -130,7 +143,7 @@ initTool({
   },
   renderReport(r) {
     const rows = r.classifications.map((c) => `
-      <tr><td>${esc(c.name)}</td><td class="bucket-${esc(c.bucket)}">${esc(c.bucket)}</td><td>${esc(c.reason)}</td></tr>`).join("");
+      <tr><td>${esc(c.name)}</td><td><span class="bucket-pill bucket-${esc(c.bucket)}">${esc(c.bucket)}</span></td><td>${esc(c.reason)}</td></tr>`).join("");
     const list = (items) => items.map((a) => `<li>${esc(a)}</li>`).join("");
     return `
       <h2>What the audit revealed</h2><p>${esc(r.observation)}</p>
@@ -142,6 +155,9 @@ initTool({
       <h3>This quarter — bigger decisions</h3><ul class="actions">${list(r.actions_quarter)}</ul>
       ${r.scope_creep_note ? `<h2>About that unbilled work</h2><p>${esc(r.scope_creep_note)}</p>` : ""}
       <p class="closing">${esc(r.closing)}</p>`;
+  },
+  onReady(_r, m) {
+    countUp(document.getElementById("leak-month"), Math.round(m.totalMonthlyLeak));
   },
 });
 </script>
