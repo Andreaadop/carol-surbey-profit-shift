@@ -21,33 +21,42 @@
   <p class="intro">Most business owners are surprised by this number — what <em>feels</em> profitable and what <em>is</em> profitable are often very different things. Grab your last 3 months of financials (estimates are fine) and find out in 5 minutes.</p>
 
   <div id="form-error" hidden></div>
+  <div id="form-progress"></div>
 
   <form id="tool-form" class="tool-form" novalidate>
-    <div class="field">
-      <label for="revenue">Total revenue — last 3 months ($)</label>
-      <input id="revenue" name="revenue" type="number" min="1" step="any" required>
-      <p class="hint">All money that came in, before any expenses.</p>
-    </div>
-    <div class="field">
-      <label for="cogs">Cost of Goods Sold — last 3 months ($)</label>
-      <input id="cogs" name="cogs" type="number" min="0" step="any" required>
-      <p class="hint">What you spend on specific jobs — field labor, subs, materials, disposal. If you didn't take the job, you wouldn't have spent it. Pure service with no delivery costs? Use 0.</p>
-    </div>
-    <div class="field">
-      <label for="opex">Operating expenses — last 3 months ($)</label>
-      <input id="opex" name="opex" type="number" min="0" step="any" required>
-      <p class="hint">What you pay whether you worked 10 jobs or 1 — software, rent, marketing, admin, insurance, vehicles.</p>
-    </div>
-    <div class="field">
-      <label for="ownerSalary">What you paid yourself — last 3 months ($)</label>
-      <input id="ownerSalary" name="ownerSalary" type="number" min="0" step="any" required>
-      <p class="hint">Salary or draws. Most owners leave this out — which makes the margin look better than it is. If it's 0, enter 0; we'll show you your corrected number.</p>
-    </div>
-    <div class="field">
-      <label for="email">Your email — to unlock your report</label>
-      <input id="email" name="email" type="email" required autocomplete="email">
-      <p class="hint">Your report appears right here on this page a few seconds after you hit the button — no email is sent.</p>
-    </div>
+    <fieldset>
+      <legend>Your numbers</legend>
+      <div class="field">
+        <label for="revenue">Total revenue — last 3 months ($)</label>
+        <input id="revenue" name="revenue" type="number" min="1" step="any" required>
+        <p class="hint">All money that came in, before any expenses.</p>
+      </div>
+      <div class="field">
+        <label for="cogs">Cost of Goods Sold — last 3 months ($)</label>
+        <input id="cogs" name="cogs" type="number" min="0" step="any" required>
+        <p class="hint">What you spend on specific jobs — field labor, subs, materials, disposal. If you didn't take the job, you wouldn't have spent it. Pure service with no delivery costs? Use 0.</p>
+      </div>
+      <div class="field">
+        <label for="opex">Operating expenses — last 3 months ($)</label>
+        <input id="opex" name="opex" type="number" min="0" step="any" required>
+        <p class="hint">What you pay whether you worked 10 jobs or 1 — software, rent, marketing, admin, insurance, vehicles.</p>
+      </div>
+      <div class="field">
+        <label for="ownerSalary">What you paid yourself — last 3 months ($)</label>
+        <input id="ownerSalary" name="ownerSalary" type="number" min="0" step="any" required>
+        <p class="hint">Salary or draws. Most owners leave this out — which makes the margin look better than it is. If it's 0, enter 0; we'll show you your corrected number.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Unlock your report</legend>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+        <p class="hint">Your report appears right here on this page a few seconds after you hit the button — no email is sent.</p>
+      </div>
+    </fieldset>
+
     <button class="btn" type="submit" data-label="Run my profit check">Run my profit check</button>
     <p class="form-note">Free. Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
   </form>
@@ -72,7 +81,9 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp } from "./assets/js/tool-ui.js";
+
+const band = (x) => x >= 20 ? "status-healthy" : x >= 10 ? "status-watch" : "status-critical";
 
 initTool({
   toolId: "profit-margin-check",
@@ -81,10 +92,11 @@ initTool({
     return { revenue: v("revenue"), cogs: v("cogs"), opex: v("opex"), ownerSalary: v("ownerSalary") };
   },
   renderMetrics(m) {
-    const band = (x) => x >= 20 ? "status-healthy" : x >= 10 ? "status-watch" : "status-critical";
     let html = `
-      <h2>Your true profit margin</h2>
-      <div class="big-number ${band(m.margin)}">${esc(m.margin)}%</div>
+      <div class="hero-stat">
+        <div class="sub">Your true profit margin</div>
+        <div id="margin-number" class="big-number ${band(m.margin)}">0%</div>
+      </div>
       <table class="metric-table">
         <tr><th>True net profit (3 months)</th><td class="num">${money(m.trueNetProfit)}</td></tr>
         <tr><th>True profit margin</th><td class="num ${band(m.margin)}">${esc(m.margin)}%</td></tr>`;
@@ -102,6 +114,9 @@ initTool({
       <h2>Why it's what it is</h2><p>${esc(r.root_cause)}</p>
       <h2>Your next step</h2><p>${esc(r.next_step)}</p>
       <p class="closing">${esc(r.closing)}</p>`;
+  },
+  onReady(_r, m) {
+    countUp(document.getElementById("margin-number"), m.margin, { suffix: "%" });
   },
 });
 </script>
