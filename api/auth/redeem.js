@@ -7,6 +7,11 @@ import { createSession, buildSessionCookie } from "../_lib/auth.js";
 // corporate email link scanners (which prefetch GETs) can't burn them.
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
+  // JSON only — a cross-site urlencoded <form> POST must not reach the token
+  // logic (login-CSRF hardening); auth.html always sends JSON.
+  if (!String(req.headers["content-type"] ?? "").includes("application/json")) {
+    return res.status(415).json({ ok: false });
+  }
 
   const kv = getKV();
   const hour = new Date().toISOString().slice(0, 13);
