@@ -67,6 +67,12 @@ class MemoryKV {
     this._persist();
     return existed ? 1 : 0;
   }
+  async getdel(key) {
+    const value = this.map.has(key) ? this.map.get(key) : null;
+    this.map.delete(key);
+    this._persist();
+    return value;
+  }
 }
 
 export function getKV() {

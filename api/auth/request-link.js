@@ -34,7 +34,7 @@ export default async function handler(req, res) {
       await sendEmail({
         contactId: check.contactId,
         subject: MAGIC_LINK_SUBJECT,
-        html: renderMagicLinkEmail(`${base}/api/auth/redeem?token=${token}`),
+        html: renderMagicLinkEmail(`${base}/auth.html?token=${token}`),
       });
     }
   } catch (err) {

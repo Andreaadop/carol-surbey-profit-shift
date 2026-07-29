@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   const { toolId, email, formData } = req.body ?? {};
 
-  const tool = TOOLS[toolId];
+  const tool = Object.hasOwn(TOOLS, toolId) ? TOOLS[toolId] : null;
   if (!tool) return res.status(400).json({ error: "unknown_tool" });
   const cleanEmail = String(email ?? "").trim().toLowerCase();
   if (!EMAIL_RE.test(cleanEmail) || cleanEmail.length > 254) {

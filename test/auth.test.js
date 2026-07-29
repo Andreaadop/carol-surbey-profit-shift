@@ -46,6 +46,20 @@ test("decideMembership: productId narrows which subscriptions count", () => {
   assert.equal(decideMembership([], viaLineItems, "prodB").member, true);
 });
 
+test("parseCookies never throws on malformed percent-encoding", () => {
+  const c = parseCookies("promo=100%; psf_m=abc-def; broken=%E0%A4%A");
+  assert.equal(c.promo, "100%");
+  assert.equal(c.psf_m, "abc-def");
+  assert.equal(c.broken, "%E0%A4%A");
+});
+
+test("kv.getdel returns the value exactly once", async () => {
+  const kv = getKV();
+  await kv.set("auth:tok2", { email: "z@y.co" }, { ex: 60 });
+  assert.deepEqual(await kv.getdel("auth:tok2"), { email: "z@y.co" });
+  assert.equal(await kv.getdel("auth:tok2"), null);
+});
+
 test("kv.del makes tokens single-use", async () => {
   const kv = getKV();
   await kv.set("auth:tok1", { email: "x@y.co" }, { ex: 60 });

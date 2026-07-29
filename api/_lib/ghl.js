@@ -82,6 +82,7 @@ export async function findOrCreateContact(email) {
   const data = await ghl("/contacts/upsert", {
     locationId: process.env.GHL_LOCATION_ID,
     email,
+    source: "CEO Profit Shift tools site",
   });
   const contact = data.contact ?? data;
   let tags = contact.tags;

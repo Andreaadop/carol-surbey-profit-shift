@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Sign in — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <div class="lock-card" style="margin-top: 2rem;">
+    <div class="lock-head">Sign in to your tools</div>
+    <p id="auth-status">Click below to finish signing in on this device.</p>
+    <button id="auth-go" class="btn" type="button">Open my tools</button>
+  </div>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script>
+(function () {
+  var token = new URLSearchParams(location.search).get("token") || "";
+  var status = document.getElementById("auth-status");
+  var btn = document.getElementById("auth-go");
+  var done = false;
+
+  function fail() {
+    status.textContent = "That sign-in link expired or was already used. Head to a tool page and request a fresh one.";
+    btn.textContent = "Go to the tools";
+    btn.onclick = function () { location.href = "/monthly-dashboard.html"; };
+  }
+
+  function redeem() {
+    if (done) return;
+    done = true;
+    btn.disabled = true;
+    status.textContent = "Signing you in…";
+    fetch("/api/auth/redeem", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token: token }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.ok) location.href = "/monthly-dashboard.html?auth=ok";
+        else fail();
+      })
+      .catch(function () { done = false; btn.disabled = false; status.textContent = "Network problem — try the button again."; });
+  }
+
+  if (!token) fail();
+  else btn.onclick = redeem;
+})();
+</script>
+</body>
+</html>

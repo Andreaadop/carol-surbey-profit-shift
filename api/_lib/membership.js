@@ -28,7 +28,11 @@ export async function isMember(email) {
   if (decideMembership(contact.tags, [], null).member) {
     return { member: true, via: "comp", contactId: contact.id };
   }
+  const productId = process.env.GHL_PRODUCT_ID || null;
+  if (!productId) {
+    console.warn("[membership] GHL_PRODUCT_ID unset — ANY active subscription grants access");
+  }
   const subs = await listSubscriptions(contact.id);
-  const decision = decideMembership([], subs, process.env.GHL_PRODUCT_ID || null);
+  const decision = decideMembership([], subs, productId);
   return { ...decision, contactId: contact.id };
 }

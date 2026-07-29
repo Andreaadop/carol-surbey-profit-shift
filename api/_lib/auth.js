@@ -8,12 +8,18 @@ export const SESSION_COOKIE = "psf_m";
 const SESSION_TTL_SECONDS = 30 * 86400;
 const REVERIFY_AFTER_MS = 24 * 3600 * 1000;
 
-// Pure — unit-testable.
+// Pure — unit-testable. A malformed value in ANY cookie (e.g. a stray "100%"
+// set by an extension) must never throw, or every gated endpoint 500s.
 export function parseCookies(header) {
   const out = {};
   for (const part of String(header ?? "").split(";")) {
     const i = part.indexOf("=");
-    if (i > 0) out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim());
+    if (i > 0) {
+      const raw = part.slice(i + 1).trim();
+      let value = raw;
+      try { value = decodeURIComponent(raw); } catch { /* keep raw */ }
+      out[part.slice(0, i).trim()] = value;
+    }
   }
   return out;
 }
