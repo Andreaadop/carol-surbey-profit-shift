@@ -75,6 +75,12 @@ test("report text is escaped — injected markup cannot reach the email DOM", ()
   assert.ok(html.includes("&lt;script&gt;"), "escaping not applied");
 });
 
+test("user-typed month cannot inject control characters into the subject", () => {
+  const subject = emailSubject("monthly-dashboard", { month: "June\r\nBcc: evil@x.com" }, DASH.metrics);
+  assert.ok(!subject.includes("\r") && !subject.includes("\n"), "control chars leaked into subject");
+  assert.equal(subject, "Your Monthly Dashboard — June  Bcc: evil@x.com");
+});
+
 test("no banned words in template chrome", () => {
   const html = (
     renderReportEmail("profit-margin-check", PMC.data, PMC.metrics, PMC.report) +

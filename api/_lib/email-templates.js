@@ -139,8 +139,12 @@ export function renderReportEmail(toolId, data, metrics, report) {
   return wrap(body);
 }
 
+// Subjects reach header-like fields — strip control characters from any
+// user-typed text so nothing header-breaking can pass through to GHL.
+const headerSafe = (s) => [...String(s ?? "")].map((ch) => (ch.charCodeAt(0) < 32 || ch.charCodeAt(0) === 127 ? " " : ch)).join("").trim();
+
 export function emailSubject(toolId, data, metrics) {
   if (toolId === "profit-margin-check") return `Your Profit Margin Check: ${metrics.margin}%`;
-  if (toolId === "monthly-dashboard") return `Your Monthly Dashboard — ${data.month}`;
+  if (toolId === "monthly-dashboard") return `Your Monthly Dashboard — ${headerSafe(data.month)}`;
   return `Your Cash Leak Audit: ${money(metrics.totalMonthlyLeak)}/mo found`;
 }
