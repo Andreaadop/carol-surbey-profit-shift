@@ -21,6 +21,7 @@
   <p class="intro">Your monthly cash flow review: enter one month of numbers, get the five metrics that matter for a service business, three flags, three priority actions — and a one-page snapshot you can print, file, and compare month over month. Rough estimates are fine; don't let a missing number stop you.</p>
 
   <div id="form-error" hidden></div>
+  <div id="form-progress"></div>
 
   <form id="tool-form" class="tool-form" novalidate>
     <fieldset>
@@ -85,11 +86,14 @@
         <textarea id="unusualOutflows" name="unusualOutflows" rows="2" maxlength="400"></textarea></div>
     </fieldset>
 
-    <div class="field">
-      <label for="email">Your email — to unlock your report</label>
-      <input id="email" name="email" type="email" required autocomplete="email">
-      <p class="hint">Your report appears right here on this page a few seconds after you hit the button — no email is sent.</p>
-    </div>
+    <fieldset>
+      <legend>Unlock your report</legend>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+        <p class="hint">Your report appears right here on this page a few seconds after you hit the button — no email is sent.</p>
+      </div>
+    </fieldset>
     <button class="btn" type="submit" data-label="Run my monthly review">Run my monthly review</button>
     <p class="form-note">Free. Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
   </form>
@@ -127,6 +131,17 @@ const ROWS = [
   ["cashRunway", "Cash Runway", "how many months your cash would cover overhead if nothing came in", (v) => `${v} months`, "3+ months"],
 ];
 const ICON = { healthy: "✅", watch: "⚠️", critical: "🚨" };
+const PILL = { healthy: "✅ Healthy", watch: "⚠️ Watch", critical: "🚨 Critical" };
+
+function statCards(m) {
+  return `<div class="stat-grid">${ROWS.map(([k, label, plain, fmt]) => `
+    <div class="stat-card">
+      <div class="stat-val status-${m.status[k]}">${fmt(esc(m[k]))}</div>
+      <span class="stat-name">${label}</span>
+      <span class="stat-plain">${plain}</span>
+      <span class="status-pill pill-${m.status[k]}">${PILL[m.status[k]]}</span>
+    </div>`).join("")}</div>`;
+}
 
 function metricsTable(m) {
   const rows = ROWS.map(([k, label, plain, fmt, bench]) => `
@@ -147,7 +162,7 @@ initTool({
     return data;
   },
   renderMetrics(m) {
-    return `<h2>The numbers at a glance</h2>${metricsTable(m)}`;
+    return `<h2>The numbers at a glance</h2>${statCards(m)}`;
   },
   renderReport(r) {
     return `
