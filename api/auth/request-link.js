@@ -28,12 +28,13 @@ export default async function handler(req, res) {
     if (check.member && check.contactId) {
       const token = randomUUID();
       await kv.set(`auth:${token}`, { email }, { ex: TOKEN_TTL_SECONDS });
-      const base = process.env.NOW_REGION === "dev1"
-        ? "http://localhost:3111"
-        : "https://profit-shift-site.vercel.app";
+      const isDev = process.env.NOW_REGION === "dev1";
+      const base = isDev ? "http://localhost:3111" : "https://profit-shift-site.vercel.app";
       await sendEmail({
         contactId: check.contactId,
-        subject: MAGIC_LINK_SUBJECT,
+        // Local `vercel dev` sends REAL emails — label them so a localhost
+        // link in someone's inbox is never mistaken for a production email.
+        subject: isDev ? `[LOCAL TEST — ignore] ${MAGIC_LINK_SUBJECT}` : MAGIC_LINK_SUBJECT,
         html: renderMagicLinkEmail(`${base}/auth.html?token=${token}`),
       });
     }
