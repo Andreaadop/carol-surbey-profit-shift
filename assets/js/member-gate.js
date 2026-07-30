@@ -2,7 +2,7 @@
 // enforces membership server-side regardless of what this shows.
 import { esc } from "./tool-ui.js";
 
-export const CHECKOUT_URL = "/#pricing"; // replaced with the GHL payment link
+export const CHECKOUT_URL = "https://link.feacreate.com/payment-link/6a6b660a7b99151a540415b4";
 
 export async function initGate() {
   const form = document.getElementById("tool-form");
