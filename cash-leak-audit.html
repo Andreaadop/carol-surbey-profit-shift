@@ -73,6 +73,7 @@
   <section id="report" class="report" hidden>
     <div id="metrics"></div>
     <div id="report-body"></div>
+    <button class="btn secondary pdf-btn" type="button">💾 Save report as PDF</button>
     <div class="followup">
       <h3>💬 Ask about your report</h3>
       <p id="fu-counter"></p>
@@ -90,7 +91,7 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money, countUp, flowBar } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp, flowBar, printReport } from "./assets/js/tool-ui.js";
 import { initGate } from "./assets/js/member-gate.js";
 initGate();
 
@@ -161,6 +162,7 @@ initTool({
     countUp(document.getElementById("leak-month"), Math.round(m.totalMonthlyLeak));
   },
 });
+document.querySelector(".pdf-btn").addEventListener("click", () => printReport("Cash Leak Audit — The CEO Profit Shift"));
 </script>
 </body>
 </html>

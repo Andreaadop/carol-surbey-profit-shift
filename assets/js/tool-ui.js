@@ -66,6 +66,25 @@ export function gaugeSVG(value) {
   </svg>`;
 }
 
+// Print the current report via the browser's Save-as-PDF. Temporarily swaps
+// the document title (it becomes the default PDF filename) and applies the
+// print-report stylesheet mode.
+export function printReport(docTitle) {
+  const prevTitle = document.title;
+  document.body.classList.add("print-report");
+  document.title = docTitle;
+  const done = () => {
+    document.body.classList.remove("print-report");
+    document.title = prevTitle;
+    window.removeEventListener("afterprint", done);
+  };
+  window.addEventListener("afterprint", done);
+  window.print();
+  // Fallback for browsers where afterprint is unreliable; window.print()
+  // blocks while the dialog is open, so this only fires once it's closed.
+  setTimeout(done, 1500);
+}
+
 function saveForm(toolId, form) {
   const data = {};
   for (const el of form.querySelectorAll("[name]")) data[el.name] = el.value;

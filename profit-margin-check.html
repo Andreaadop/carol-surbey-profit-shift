@@ -64,6 +64,7 @@
   <section id="report" class="report" hidden>
     <div id="metrics"></div>
     <div id="report-body"></div>
+    <button class="btn secondary pdf-btn" type="button">💾 Save report as PDF</button>
     <div class="followup">
       <h3>💬 Ask about your report</h3>
       <p id="fu-counter"></p>
@@ -81,7 +82,7 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money, countUp, flowBar, gaugeSVG } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp, flowBar, gaugeSVG, printReport } from "./assets/js/tool-ui.js";
 
 const band = (x) => x >= 20 ? "status-healthy" : x >= 10 ? "status-watch" : "status-critical";
 const formNum = (n) => Number(document.querySelector(`[name=${n}]`)?.value) || 0;
@@ -127,6 +128,7 @@ initTool({
     countUp(document.getElementById("margin-number"), m.margin, { suffix: "%" });
   },
 });
+document.querySelector(".pdf-btn").addEventListener("click", () => printReport("Profit Margin Check — The CEO Profit Shift"));
 </script>
 </body>
 </html>

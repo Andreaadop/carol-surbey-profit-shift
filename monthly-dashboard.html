@@ -102,6 +102,7 @@
     <div id="metrics"></div>
     <div id="report-body"></div>
     <button id="print-btn" class="btn secondary" type="button">Print your snapshot</button>
+    <button class="btn secondary pdf-btn" type="button">💾 Save report as PDF</button>
     <div class="followup">
       <h3>💬 Ask about your report</h3>
       <p id="fu-counter"></p>
@@ -121,7 +122,7 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money, flowBar } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, flowBar, printReport } from "./assets/js/tool-ui.js";
 import { initGate } from "./assets/js/member-gate.js";
 initGate();
 
@@ -214,6 +215,7 @@ document.getElementById("print-btn").addEventListener("click", () => {
   window.print();
   document.body.classList.remove("print-snapshot");
 });
+document.querySelector(".pdf-btn").addEventListener("click", () => printReport("Monthly Dashboard — The CEO Profit Shift"));
 </script>
 </body>
 </html>

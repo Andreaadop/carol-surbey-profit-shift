@@ -241,6 +241,29 @@ fieldset.complete legend::before { content: "✓"; background: var(--sage); colo
   body.print-snapshot main > *:not(.print-only) { display: none !important; }
   body.print-snapshot .print-only { display: block; }
   body { line-height: 1.45; }
+  /* Full-report PDF mode (Save report as PDF button) */
+  body.print-report * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body.print-report .site-footer,
+  body.print-report .followup, body.print-report .email-note,
+  body.print-report #print-btn, body.print-report .pdf-btn,
+  body.print-report .signed-in,
+  body.print-report #form-progress, body.print-report form { display: none !important; }
+  body.print-report .site-header { padding: 0 0 8pt; border-bottom: 1px solid #cfd8d7; margin-bottom: 10pt; background: none; }
+  body.print-report .site-header img { height: 34px; }
+  body.print-report main { max-width: 100%; padding: 0 8pt; }
+  body.print-report .report { display: block; }
+  body.print-report .card, body.print-report .hero-stat {
+    box-shadow: none; border: 1px solid #cfd8d7; border-radius: 8px;
+    margin: 0 0 10pt; padding: 10pt 14pt; grid-column: auto;
+  }
+  body.print-report .card h2 { font-size: 13pt; margin-bottom: 4pt; }
+  body.print-report .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6pt; margin-bottom: 10pt; break-inside: avoid; }
+  body.print-report .stat-card { break-inside: avoid; }
+  body.print-report .gauge-wrap { max-width: 240px; }
+  body.print-report .hero-stat .big-number { font-size: 26pt; }
+  body.print-report .flag { break-inside: avoid; }
+  body.print-report .metric-table { font-size: 9.5pt; }
+  body.print-report .flow-track { height: 12px; }
   /* Snapshot breathing room (kept to one page) */
   #snapshot { padding: 0 .3in; }
   #snapshot h1 { font-size: 20pt; margin-bottom: 6pt; }
