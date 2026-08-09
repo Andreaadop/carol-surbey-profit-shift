@@ -9,6 +9,9 @@ import { randomUUID } from "node:crypto";
 
 const FREE_TOOLS = new Set(["profit-margin-check"]);
 
+// Kill switch: PAYWALL_DISABLED=1 opens every tool (auth stays dormant).
+const paywallOff = () => process.env.PAYWALL_DISABLED === "1";
+
 const GENERATIONS_PER_EMAIL_PER_DAY = 3;
 const GENERATIONS_PER_IP_PER_DAY = 10;
 const FOLLOWUPS_PER_SESSION = 4;
@@ -28,7 +31,7 @@ export default async function handler(req, res) {
   if (parsed.errors) return res.status(400).json({ error: "invalid_input", errors: parsed.errors });
 
   const kv = getKV();
-  if (!FREE_TOOLS.has(toolId)) {
+  if (!FREE_TOOLS.has(toolId) && !paywallOff()) {
     const auth = await requireMember(req, kv);
     if (!auth.member) return res.status(403).json({ error: "members_only" });
   }

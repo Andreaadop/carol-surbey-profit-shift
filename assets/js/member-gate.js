@@ -14,6 +14,9 @@ export async function initGate() {
     me = await (await fetch("/api/auth/me")).json();
   } catch {}
 
+  // Paywall kill switch: server reports paywall:false → tools are open.
+  if (me.paywall === false) return;
+
   if (me.member) {
     intro?.insertAdjacentHTML(
       "afterend",
