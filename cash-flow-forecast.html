@@ -9,6 +9,36 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/brand.css">
+<style>
+/* --- page-local: month-grid form layout --- */
+.month-grid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem 1.1rem; }
+.month-col { border: 1px solid var(--light-sage); background: rgba(233,248,247,.45); border-radius: var(--radius-sm); padding: .95rem 1rem 1.1rem; display: grid; gap: .85rem; align-content: start; }
+.month-col .m-head { font-weight: 700; color: var(--navy); font-size: .92rem; }
+.month-col .m-sub { font-weight: 400; color: var(--grey-light); font-size: .76rem; margin-left: .3rem; }
+.group-hint { grid-column: 1 / -1; margin: -.2rem 0 .1rem; }
+.group-hint strong { color: var(--navy); }
+.span-all { grid-column: 1 / -1; }
+@media (max-width: 760px) { .month-grid { grid-template-columns: 1fr; } }
+
+/* --- page-local: month-by-month cash flow bar chart --- */
+.cfc-chart { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.2rem; }
+.cfc-bars { height: 150px; display: flex; align-items: flex-end; justify-content: center; gap: .55rem; border-bottom: 2px solid var(--light-sage); padding: 0 .3rem; }
+.cfc-bar { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; width: 52px; }
+.cfc-bar .v { font-size: .74rem; font-weight: 600; color: var(--grey); font-variant-numeric: tabular-nums; white-space: nowrap; margin-bottom: .25rem; }
+.cfc-bar i { display: block; width: 100%; border-radius: 6px 6px 0 0; min-height: 3px; }
+.cfc-in { background: var(--teal); }
+.cfc-out { background: var(--navy); }
+.cfc-mname { text-align: center; font-weight: 600; color: var(--navy); font-size: .88rem; margin-top: .55rem; }
+.cfc-net { text-align: center; font-size: .92rem; font-variant-numeric: tabular-nums; }
+.cfc-run { text-align: center; font-size: .76rem; color: var(--grey-light); font-variant-numeric: tabular-nums; }
+.cfc-legend { margin-top: 1rem; }
+@media (max-width: 560px) { .cfc-bar { width: 34px; } .cfc-bar .v { font-size: .64rem; } }
+
+/* --- page-local: buffer progress bar --- */
+.cfc-buffer-track { height: 18px; border-radius: 999px; background: var(--light-sage); overflow: hidden; margin: 1rem 0 .6rem; }
+.cfc-buffer-track span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--teal), var(--teal-light)); min-width: 6px; }
+.cfc-buffer-scale { display: flex; justify-content: space-between; font-size: .78rem; color: var(--grey-light); margin-bottom: .6rem; }
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -26,49 +56,76 @@
   <form id="tool-form" class="tool-form" novalidate>
     <fieldset>
       <legend>Money coming in — next 90 days</legend>
-      <div class="field"><label for="confirmed1">Month 1 (next 30 days): confirmed revenue — already contracted or committed ($)</label>
-        <input id="confirmed1" name="confirmed1" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="expected1">Month 1: expected new work — your conservative pipeline floor ($)</label>
-        <input id="expected1" name="expected1" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="confirmed2">Month 2 (days 31–60): confirmed revenue ($)</label>
-        <input id="confirmed2" name="confirmed2" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="expected2">Month 2: expected new work ($)</label>
-        <input id="expected2" name="expected2" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="confirmed3">Month 3 (days 61–90): confirmed revenue ($)</label>
-        <input id="confirmed3" name="confirmed3" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="expected3">Month 3: expected new work ($)</label>
-        <input id="expected3" name="expected3" type="number" min="0" step="any" required></div>
+      <p class="hint group-hint"><strong>Confirmed</strong> = signed contracts, retainers, work already booked. The money you'd bet on. <strong>Expected</strong> = your conservative pipeline floor — what you'd be surprised <em>not</em> to close, not what you're hoping for.</p>
+      <div class="month-grid">
+        <div class="month-col">
+          <div><span class="m-head">Month 1</span><span class="m-sub">next 30 days</span></div>
+          <div class="field"><label for="confirmed1">Confirmed revenue ($)</label>
+            <input id="confirmed1" name="confirmed1" type="number" min="0" step="any" required></div>
+          <div class="field"><label for="expected1">Expected new work ($)</label>
+            <input id="expected1" name="expected1" type="number" min="0" step="any" required></div>
+        </div>
+        <div class="month-col">
+          <div><span class="m-head">Month 2</span><span class="m-sub">days 31–60</span></div>
+          <div class="field"><label for="confirmed2">Confirmed revenue ($)</label>
+            <input id="confirmed2" name="confirmed2" type="number" min="0" step="any" required></div>
+          <div class="field"><label for="expected2">Expected new work ($)</label>
+            <input id="expected2" name="expected2" type="number" min="0" step="any" required></div>
+        </div>
+        <div class="month-col">
+          <div><span class="m-head">Month 3</span><span class="m-sub">days 61–90</span></div>
+          <div class="field"><label for="confirmed3">Confirmed revenue ($)</label>
+            <input id="confirmed3" name="confirmed3" type="number" min="0" step="any" required></div>
+          <div class="field"><label for="expected3">Expected new work ($)</label>
+            <input id="expected3" name="expected3" type="number" min="0" step="any" required></div>
+        </div>
+      </div>
     </fieldset>
 
     <fieldset>
       <legend>Money going out</legend>
-      <div class="field"><label for="fixedMonthly">Fixed expenses — the same every month: payroll, rent, loans, insurance, subscriptions ($/month)</label>
-        <input id="fixedMonthly" name="fixedMonthly" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="variable1">Month 1: variable costs — costs that move with job volume: subcontractors, materials, fuel ($)</label>
-        <input id="variable1" name="variable1" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="variable2">Month 2: variable costs ($)</label>
-        <input id="variable2" name="variable2" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="variable3">Month 3: variable costs ($)</label>
-        <input id="variable3" name="variable3" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="oneTime1">Month 1: known one-time hits — equipment, tax payment, renewals ($ — 0 if none)</label>
-        <input id="oneTime1" name="oneTime1" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="oneTime2">Month 2: known one-time hits ($ — 0 if none)</label>
-        <input id="oneTime2" name="oneTime2" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="oneTime3">Month 3: known one-time hits ($ — 0 if none)</label>
-        <input id="oneTime3" name="oneTime3" type="number" min="0" step="any" required></div>
+      <div class="field span-all"><label for="fixedMonthly">Fixed expenses ($/month)</label>
+        <input id="fixedMonthly" name="fixedMonthly" type="number" min="0" step="any" required>
+        <p class="hint">The bills that arrive whether you worked 10 jobs or 1 — payroll, rent, loan payments, insurance, subscriptions. One number, same every month.</p></div>
+      <p class="hint group-hint"><strong>Variable costs</strong> move with job volume — subcontractors, materials, fuel. <strong>One-time hits</strong> are the irregulars you already know are coming: equipment, tax payments, renewals. Enter 0 if none.</p>
+      <div class="month-grid">
+        <div class="month-col">
+          <div><span class="m-head">Month 1</span><span class="m-sub">next 30 days</span></div>
+          <div class="field"><label for="variable1">Variable costs ($)</label>
+            <input id="variable1" name="variable1" type="number" min="0" step="any" required></div>
+          <div class="field"><label for="oneTime1">One-time hits ($)</label>
+            <input id="oneTime1" name="oneTime1" type="number" min="0" step="any" required></div>
+        </div>
+        <div class="month-col">
+          <div><span class="m-head">Month 2</span><span class="m-sub">days 31–60</span></div>
+          <div class="field"><label for="variable2">Variable costs ($)</label>
+            <input id="variable2" name="variable2" type="number" min="0" step="any" required></div>
+          <div class="field"><label for="oneTime2">One-time hits ($)</label>
+            <input id="oneTime2" name="oneTime2" type="number" min="0" step="any" required></div>
+        </div>
+        <div class="month-col">
+          <div><span class="m-head">Month 3</span><span class="m-sub">days 61–90</span></div>
+          <div class="field"><label for="variable3">Variable costs ($)</label>
+            <input id="variable3" name="variable3" type="number" min="0" step="any" required></div>
+          <div class="field"><label for="oneTime3">One-time hits ($)</label>
+            <input id="oneTime3" name="oneTime3" type="number" min="0" step="any" required></div>
+        </div>
+      </div>
     </fieldset>
 
     <fieldset>
       <legend>Where you stand</legend>
-      <div class="field"><label for="currentBuffer">Cash reserve beyond your operating account ($ — 0 if none)</label>
-        <input id="currentBuffer" name="currentBuffer" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="currentBuffer">Cash reserve beyond your operating account ($)</label>
+        <input id="currentBuffer" name="currentBuffer" type="number" min="0" step="any" required>
+        <p class="hint">Savings, a reserve account — cash you could actually reach if a month goes sideways. 0 is an honest answer, and more common than you'd think.</p></div>
       <div class="field"><label for="pattern">Over the last 6 months, your revenue has been…</label>
         <select id="pattern" name="pattern" required>
           <option value="" disabled selected>Choose one</option>
           <option value="predictable">Fairly predictable</option>
           <option value="swings">Good months and terrible months</option>
           <option value="unsure">Genuinely unsure</option>
-        </select></div>
+        </select>
+        <p class="hint">Be honest — the forecast is only as good as your read on your own swings.</p></div>
     </fieldset>
 
     <fieldset>
@@ -118,8 +175,9 @@ import { initTool, esc, money, countUp, printReport } from "./assets/js/tool-ui.
 import { initGate } from "./assets/js/member-gate.js";
 initGate();
 
-const signedMoney = (n) => (n < 0 ? "−" + money(Math.abs(n)) : money(n));
+const signedMoney = (n) => (n < 0 ? "−" + money(Math.abs(n)) : "+" + money(n));
 const netCls = (n) => (n < 0 ? "status-critical" : "status-healthy");
+const kMoney = (n) => (Math.abs(n) >= 1000 ? "$" + (Math.round(n / 100) / 10).toLocaleString("en-US") + "k" : money(n));
 
 initTool({
   toolId: "cash-flow-forecast",
@@ -129,17 +187,23 @@ initTool({
     return data;
   },
   renderMetrics(m) {
-    const tightest = m.tightestNet < 0
-      ? `Month ${esc(m.tightestMonth)} · <span class="status-critical">−${money(Math.abs(m.tightestNet))}</span>`
-      : `Month ${esc(m.tightestMonth)} · <span class="status-healthy">+${money(m.tightestNet)}</span>`;
+    const tightest = `<span class="${netCls(m.tightestNet)}">${signedMoney(m.tightestNet)}</span>`;
     const tightestSub = m.tightestNet < 0
-      ? "a warning you now have time to act on"
-      : "even your tightest month comes out ahead";
-    const rows = m.months.map((mo, i) => `
-      <tr><th>Month ${i + 1}</th>
-        <td class="num">${money(mo.inflow)}</td>
-        <td class="num">${money(mo.outflow)}</td>
-        <td class="num ${netCls(mo.net)}">${esc(signedMoney(mo.net))}</td></tr>`).join("");
+      ? `Month ${esc(m.tightestMonth)} — a warning you now have time to act on`
+      : `Month ${esc(m.tightestMonth)} — even your tightest month comes out ahead`;
+    const maxFlow = Math.max(1, ...m.months.flatMap((mo) => [mo.inflow, mo.outflow]));
+    const pct = (v) => Math.max(2, Math.round((v / maxFlow) * 100));
+    const cols = m.months.map((mo, i) => `
+      <div class="cfc-month">
+        <div class="cfc-bars">
+          <div class="cfc-bar"><span class="v">${kMoney(mo.inflow)}</span><i class="cfc-in" style="height:${pct(mo.inflow)}%"></i></div>
+          <div class="cfc-bar"><span class="v">${kMoney(mo.outflow)}</span><i class="cfc-out" style="height:${pct(mo.outflow)}%"></i></div>
+        </div>
+        <div class="cfc-mname">Month ${i + 1}</div>
+        <div class="cfc-net ${netCls(mo.net)}">${signedMoney(mo.net)}</div>
+        <div class="cfc-run">running ${signedMoney(mo.cumulative)}</div>
+      </div>`).join("");
+    const bufPct = Math.max(2, Math.min(100, Math.round((m.currentBuffer / Math.max(1, m.bufferTarget)) * 100)));
     return `
       <div class="card sp-6 hero-stat">
         <div class="sub">90-day net position</div>
@@ -151,35 +215,45 @@ initTool({
         <div class="big-number">${tightest}</div>
         <div class="sub">${tightestSub}</div>
       </div>
-      <div class="card">
-        <table class="metric-table">
-          <tr><th></th><th>In</th><th>Out</th><th>Net</th></tr>
-          ${rows}
-          <tr><th>Total</th>
-            <td class="num">${money(m.totalIn)}</td>
-            <td class="num">${money(m.totalOut)}</td>
-            <td class="num ${netCls(m.netPosition)}">${esc(signedMoney(m.netPosition))}</td></tr>
-        </table>
+      <div class="card sp-7">
+        <h2>📊 The 90-day picture</h2>
+        <div class="cfc-chart">${cols}</div>
+        <div class="flow-legend cfc-legend">
+          <span class="flow-key"><i class="fs-teal"></i>Money in · ${money(m.totalIn)}</span>
+          <span class="flow-key"><i class="fs-navy"></i>Money out · ${money(m.totalOut)}</span>
+          <span class="flow-key">90-day net <span class="${netCls(m.netPosition)}">${signedMoney(m.netPosition)}</span></span>
+        </div>
       </div>
-      <div class="card">
-        <p class="flow-note" style="margin:0">🛟 Buffer target ${money(m.bufferTarget)} (one month of fixed expenses) · you have ${money(m.currentBuffer)} · gap ${money(m.bufferGap)}</p>
+      <div class="card sp-5">
+        <h2>🛟 Cash buffer</h2>
+        <div class="cfc-buffer-track"><span style="width:${bufPct}%"></span></div>
+        <div class="cfc-buffer-scale"><span>$0</span><span>target ${money(m.bufferTarget)}</span></div>
+        <table class="metric-table">
+          <tr><th>You have</th><td class="num">${money(m.currentBuffer)}</td></tr>
+          <tr><th>Target — one month of fixed costs</th><td class="num">${money(m.bufferTarget)}</td></tr>
+          <tr><th>Gap to close</th><td class="num ${m.bufferGap > 0 ? "status-critical" : "status-healthy"}">${money(m.bufferGap)}</td></tr>
+        </table>
       </div>`;
   },
   renderReport(r) {
     return `
-      <div class="card sp-7"><h2>🔍 The pattern</h2><p>${esc(r.pattern_read)}</p></div>
-      <div class="card sp-5"><h2>🗓️ Month by month</h2>
+      <div class="card sp-5"><h2>🔍 The pattern</h2><p>${esc(r.pattern_read)}</p></div>
+      <div class="card sp-7"><h2>🗓️ Month by month</h2>
         <ul class="actions">${r.month_notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
       </div>
-      <div class="card sp-6 tint-amber"><h2>🛟 Your cash buffer</h2><p>${esc(r.buffer_plan)}</p></div>
-      <div class="card sp-6 tint-mint"><h2>⚡ Stabilize it</h2>
+      <div class="card sp-5 tint-amber"><h2>🛟 Your cash buffer</h2><p>${esc(r.buffer_plan)}</p></div>
+      <div class="card sp-7 tint-mint"><h2>⚡ Stabilize it</h2>
         <ol class="actions">${r.actions.map((a) => `<li>${esc(a)}</li>`).join("")}</ol>
       </div>
       <div class="card tint-sage"><h2>📅 The weekly 5-minute check</h2><p>${esc(r.weekly_review)}</p></div>
       <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {
-    countUp(document.getElementById("net-pos"), Math.abs(Math.round(m.netPosition)));
+    const el = document.getElementById("net-pos");
+    const target = Math.abs(Math.round(m.netPosition));
+    countUp(el, target);
+    // countUp ends on the raw number; settle on the comma-grouped final figure.
+    setTimeout(() => { el.textContent = target.toLocaleString("en-US"); }, 900);
   },
 });
 document.querySelector(".pdf-btn").addEventListener("click", () => printReport("Cash Flow Forecast — The CEO Profit Shift"));

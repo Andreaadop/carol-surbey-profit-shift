@@ -9,6 +9,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/brand.css">
+<style>
+/* Page-local visuals: week bars + two-week comparison (brand palette, no absolute positioning) */
+.wk-rows { display: grid; gap: .5rem; margin-top: .9rem; }
+.wk-row { display: grid; grid-template-columns: 106px 1fr 84px; gap: .65rem; align-items: center; }
+.card .wk-title { margin-top: .6rem; }
+.wk-row .lbl { font-size: .72rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--navy); }
+.wk-track { display: flex; gap: 1px; height: 16px; border-radius: 999px; background: #eef3f6; overflow: hidden; }
+.wk-seg { display: block; height: 100%; min-width: 4px; }
+.wk-val { font-size: .84rem; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; color: var(--dark); }
+.wk-note { font-size: .8rem; color: var(--grey-light); margin-top: .7rem; }
+.wk-callout { margin-top: .9rem; padding: .7rem .9rem; border-radius: var(--radius-sm); background: #f8e4e4; color: var(--critical); font-size: .86rem; font-weight: 600; }
+.twk-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; padding-top: .9rem; border-top: 1px solid var(--light-sage); }
+.twk-stat .v { font-size: 1.45rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.twk-stat .k { display: block; margin-top: .15rem; font-size: .72rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--navy); }
+@media (max-width: 520px) { .wk-row { grid-template-columns: 78px 1fr 74px; } }
+body.print-report .wk-track { height: 11px; }
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -27,30 +44,38 @@
     <fieldset>
       <legend>This week's three numbers</legend>
       <div class="field"><label for="period">What week are we looking at?</label>
-        <input id="period" name="period" maxlength="40" required placeholder="e.g. Aug 3–9"></div>
+        <input id="period" name="period" maxlength="40" required placeholder="e.g. Aug 3–9">
+        <p class="hint">Any label you'll recognize later — dates, a week number, whatever your calendar uses.</p></div>
       <div class="field"><label for="revenueIn">Revenue in — everything that came in this week ($)</label>
-        <input id="revenueIn" name="revenueIn" type="number" min="0" step="any" required></div>
+        <input id="revenueIn" name="revenueIn" type="number" min="0" step="any" required>
+        <p class="hint">Money that actually landed in the account — not invoices sent, not jobs booked.</p></div>
       <div class="field"><label for="expensesOut">Expenses out — everything that went out this week ($)</label>
-        <input id="expensesOut" name="expensesOut" type="number" min="0" step="any" required></div>
+        <input id="expensesOut" name="expensesOut" type="number" min="0" step="any" required>
+        <p class="hint">Everything that left the account — payroll, materials, subscriptions, the lot.</p></div>
       <div class="field"><label for="payrollRan">Did payroll run this week?</label>
         <select id="payrollRan" name="payrollRan" required>
           <option value="" disabled selected>Choose one</option>
           <option value="yes">Yes</option>
           <option value="no">No</option>
           <option value="weekly">Weekly payroll — it runs every week</option>
-        </select></div>
+        </select>
+        <p class="hint">Payroll weeks always read compressed — we'll use your two-week average so one payroll run doesn't look like a crisis.</p></div>
     </fieldset>
 
     <fieldset>
       <legend>Context (optional — but it sharpens the read)</legend>
       <div class="field"><label for="typicalRevenue">A typical week's revenue, roughly ($)</label>
-        <input id="typicalRevenue" name="typicalRevenue" type="number" min="0" step="any"></div>
+        <input id="typicalRevenue" name="typicalRevenue" type="number" min="0" step="any">
+        <p class="hint">A ballpark is fine — it tells us whether this week was normal or an outlier.</p></div>
       <div class="field"><label for="lastWeekRevenue">Last week's revenue ($ — for the two-week average when payroll ran)</label>
-        <input id="lastWeekRevenue" name="lastWeekRevenue" type="number" min="0" step="any"></div>
+        <input id="lastWeekRevenue" name="lastWeekRevenue" type="number" min="0" step="any">
+        <p class="hint">If payroll ran, the two weeks together are the honest number — one week alone will mislead you.</p></div>
       <div class="field"><label for="lastWeekExpenses">Last week's expenses ($)</label>
-        <input id="lastWeekExpenses" name="lastWeekExpenses" type="number" min="0" step="any"></div>
+        <input id="lastWeekExpenses" name="lastWeekExpenses" type="number" min="0" step="any">
+        <p class="hint">Same window as last week's revenue, so the average compares like with like.</p></div>
       <div class="field"><label for="unusualNote">Anything unusual this week?</label>
-        <textarea id="unusualNote" name="unusualNote" rows="2" maxlength="400" placeholder="e.g. paid the insurance premium, big job closed early"></textarea></div>
+        <textarea id="unusualNote" name="unusualNote" rows="2" maxlength="400" placeholder="e.g. paid the insurance premium, big job closed early"></textarea>
+        <p class="hint">One-time costs and early payments change the read — name them so we don't flag the wrong thing.</p></div>
     </fieldset>
 
     <fieldset>
@@ -61,16 +86,19 @@
           <option value="monday">Monday morning — before the day starts</option>
           <option value="friday">Friday afternoon — before the weekend</option>
           <option value="other">Another day that works every week</option>
-        </select></div>
+        </select>
+        <p class="hint">Same day, every week — consistency beats precision here.</p></div>
       <div class="field"><label for="trackingMethod">Where will you pull the three numbers from?</label>
         <select id="trackingMethod" name="trackingMethod" required>
           <option value="" disabled selected>Choose one</option>
           <option value="software">Accounting software (QuickBooks, Wave, etc.)</option>
           <option value="spreadsheet">A spreadsheet</option>
           <option value="manual">Bank statements, manually</option>
-        </select></div>
+        </select>
+        <p class="hint">Wherever it's fastest. This check should take five minutes, not thirty.</p></div>
       <div class="field"><label for="targetWeeklyRevenue">Your weekly revenue target, if you have one ($ — optional)</label>
-        <input id="targetWeeklyRevenue" name="targetWeeklyRevenue" type="number" min="0" step="any"></div>
+        <input id="targetWeeklyRevenue" name="targetWeeklyRevenue" type="number" min="0" step="any">
+        <p class="hint">If you have one, we'll measure the week against it. If not, your report will suggest one.</p></div>
     </fieldset>
 
     <fieldset>
@@ -106,12 +134,86 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money, printReport } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp, flowBar, printReport } from "./assets/js/tool-ui.js";
 import { initGate } from "./assets/js/member-gate.js";
 initGate();
 
+// Signed money: negatives render as "−$1,300" (minus outside the $), matching the other tools.
+const smoney = (n) => (n < 0 ? "−" + money(Math.abs(n)) : money(n));
 const PILL = { healthy: "✅ Healthy", watch: "⚠️ Watch", critical: "🚨 Critical" };
 const weekStatus = (m) => (m.net < 0 ? "critical" : m.margin < 10 ? "watch" : "healthy");
+const num = (n) => Number(document.querySelector(`[name=${n}]`)?.value) || 0;
+const pct = (v, max) => (max > 0 ? ((Math.max(v, 0) / max) * 100).toFixed(2) : "0");
+
+// Money count-up: same easing as countUp, formatted with smoney() every frame.
+function countMoney(el, value, { duration = 800 } = {}) {
+  const target = Number(value);
+  const done = () => { el.textContent = smoney(target); };
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !Number.isFinite(target)) return done();
+  const start = performance.now();
+  const tick = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    el.textContent = smoney(target * (1 - Math.pow(1 - t, 3)));
+    if (t < 1) requestAnimationFrame(tick); else done();
+  };
+  requestAnimationFrame(tick);
+}
+
+// This week's money picture. Positive week: revenue split into expenses vs net
+// kept. Negative week (flowBar refuses negatives): revenue bar vs a longer
+// expenses bar whose overshoot segment is colored critical.
+function weekVisual(rev, exp, net) {
+  if (net >= 0) {
+    const bar = flowBar("💸 Where this week's revenue went", [
+      { label: "Expenses out", value: exp, cls: "fs-navy" },
+      { label: "Net kept", value: net, cls: "fs-green" },
+    ]);
+    if (bar) return bar;
+  }
+  const over = exp - rev;
+  if (over <= 0) return `<div class="flow-title">💸 This week's money picture</div>
+    <p class="wk-note">Revenue in ${smoney(rev)}, expenses out ${smoney(exp)}, net ${smoney(net)}.</p>`;
+  const max = Math.max(rev, exp);
+  return `
+    <div class="flow-title">💸 More went out than came in</div>
+    <div class="wk-rows">
+      <div class="wk-row"><span class="lbl">Revenue in</span>
+        <span class="wk-track"><span class="wk-seg fs-teal" style="width:${pct(rev, max)}%"></span></span>
+        <span class="wk-val">${smoney(rev)}</span></div>
+      <div class="wk-row"><span class="lbl">Expenses out</span>
+        <span class="wk-track"><span class="wk-seg fs-navy" style="width:${pct(rev, max)}%"></span><span class="wk-seg fs-red" style="width:${pct(over, max)}%"></span></span>
+        <span class="wk-val">${smoney(exp)}</span></div>
+    </div>
+    <div class="wk-callout">The red stretch is the overspend — ${smoney(over)} more went out than came in this week.</div>`;
+}
+
+// The payroll-week story: this week vs last week as two net bars, then the
+// combined two-week numbers — the honest read when one week absorbed payroll.
+function twoWeekCard(m, rev, exp) {
+  const t = m.twoWeek;
+  if (!t) return "";
+  const lastNet = t.net - m.net;
+  const maxAbs = Math.max(Math.abs(m.net), Math.abs(lastNet)) || 1;
+  const row = (label, netVal) => `
+    <div class="wk-row"><span class="lbl">${label}</span>
+      <span class="wk-track"><span class="wk-seg ${netVal < 0 ? "fs-red" : "fs-green"}" style="width:${pct(Math.abs(netVal), maxAbs)}%"></span></span>
+      <span class="wk-val ${netVal < 0 ? "status-critical" : "status-healthy"}">${smoney(netVal)}</span></div>`;
+  const combined = t.net < 0 ? "status-critical" : t.margin < 10 ? "status-watch" : "status-healthy";
+  return `
+    <div class="card sp-7">
+      <h2>📆 The two-week picture</h2>
+      <div class="flow-title wk-title">Net, week by week</div>
+      <div class="wk-rows">
+        ${row("This week", m.net)}
+        ${row("Last week", lastNet)}
+      </div>
+      <div class="twk-stats">
+        <div class="twk-stat"><div class="v ${combined}" id="cu-twk-net">${smoney(t.net)}</div><span class="k">Combined net · 2 weeks</span></div>
+        <div class="twk-stat"><div class="v ${combined}" id="cu-twk-margin">${esc(t.margin)}%</div><span class="k">Combined margin</span></div>
+      </div>
+      <p class="wk-note">Combined revenue ${smoney(t.revenue)} · combined expenses ${smoney(t.expenses)}. Payroll weeks always read compressed — this is the more useful number.</p>
+    </div>`;
+}
 
 initTool({
   toolId: "ceo-weekly-profit-check",
@@ -122,39 +224,42 @@ initTool({
   },
   renderMetrics(m) {
     const s = weekStatus(m);
-    const t = m.twoWeek;
-    const num = (n) => Number(document.querySelector(`[name=${n}]`)?.value) || 0;
+    const rev = num("revenueIn"), exp = num("expensesOut");
+    const target = num("targetWeeklyRevenue");
+    const vsTarget = target > 0 && typeof m.vsTarget === "number"
+      ? `<p class="wk-note">🎯 vs your ${smoney(target)} weekly target: <strong class="${m.vsTarget < 0 ? "status-critical" : "status-healthy"}">${m.vsTarget >= 0 ? "+" : ""}${smoney(m.vsTarget)}</strong></p>` : "";
     return `
       <div class="stat-grid">
         <div class="stat-card">
-          <div class="stat-val status-healthy">${money(num("revenueIn"))}</div>
+          <div class="stat-val status-healthy" id="cu-rev">${smoney(rev)}</div>
           <span class="stat-name">Revenue in</span>
           <span class="stat-plain">everything that came in this week</span>
         </div>
         <div class="stat-card">
-          <div class="stat-val">${money(num("expensesOut"))}</div>
+          <div class="stat-val" id="cu-exp">${smoney(exp)}</div>
           <span class="stat-name">Expenses out</span>
           <span class="stat-plain">everything that went out this week</span>
         </div>
         <div class="stat-card">
-          <div class="stat-val status-${s}">${money(m.net)}</div>
+          <div class="stat-val status-${s}" id="cu-net">${smoney(m.net)}</div>
           <span class="stat-name">Net this week</span>
           <span class="stat-plain">revenue in minus expenses out</span>
           <span class="status-pill pill-${s}">${PILL[s]}</span>
         </div>
         <div class="stat-card">
-          <div class="stat-val status-${s}">${esc(m.margin)}%</div>
+          <div class="stat-val status-${s}" id="cu-margin">${esc(m.margin)}%</div>
           <span class="stat-name">Running margin</span>
           <span class="stat-plain">the share of each dollar you kept</span>
           <span class="status-pill pill-${s}">${PILL[s]}</span>
         </div>
       </div>
-      ${t ? `<div class="card"><p style="margin:0">📆 <strong>Two-week average:</strong> combined revenue ${money(t.revenue)}, combined expenses ${money(t.expenses)}, combined net <strong>${money(t.net)}</strong> (${esc(t.margin)}% margin). Payroll weeks always read compressed — this is the more useful number.</p></div>` : ""}`;
+      <div class="card ${m.twoWeek ? "sp-5" : ""}">${weekVisual(rev, exp, m.net)}${vsTarget}</div>
+      ${twoWeekCard(m, rev, exp)}`;
   },
   renderReport(r) {
     return `
-      <div class="card sp-7"><h2>🔍 The read</h2><p>${esc(r.read)}</p></div>
-      <div class="card sp-5 tint-amber"><h2>🚩 The flag</h2><p>${esc(r.flag)}</p></div>
+      <div class="card sp-6"><h2>🔍 The read</h2><p>${esc(r.read)}</p></div>
+      <div class="card sp-6 tint-amber"><h2>🚩 The flag</h2><p>${esc(r.flag)}</p></div>
       <div class="card sp-7 tint-mint"><h2>🎯 One action</h2><p>${esc(r.one_action)}</p></div>
       <div class="card sp-5"><h2>📏 Your weekly benchmarks</h2>
         <table class="metric-table">
@@ -166,6 +271,16 @@ initTool({
       </div>
       <div class="card tint-sage"><h2>📅 Your weekly habit</h2><p>${esc(r.habit_setup)}</p></div>
       <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
+  },
+  onReady(_r, m) {
+    countMoney(document.getElementById("cu-rev"), num("revenueIn"));
+    countMoney(document.getElementById("cu-exp"), num("expensesOut"));
+    countMoney(document.getElementById("cu-net"), m.net);
+    countUp(document.getElementById("cu-margin"), m.margin, { suffix: "%" });
+    if (m.twoWeek) {
+      countMoney(document.getElementById("cu-twk-net"), m.twoWeek.net);
+      countUp(document.getElementById("cu-twk-margin"), m.twoWeek.margin, { suffix: "%" });
+    }
   },
 });
 document.querySelector(".pdf-btn").addEventListener("click", () => printReport("CEO Weekly Profit Check — The CEO Profit Shift"));

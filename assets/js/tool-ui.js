@@ -16,13 +16,14 @@ const reducedMotion = () =>
 export function countUp(el, value, { suffix = "", duration = 800 } = {}) {
   const target = Number(value);
   const decimals = Number.isInteger(target) ? 0 : 1;
-  const done = () => { el.textContent = target.toFixed(decimals) + suffix; };
+  const fmt = (v) => v.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const done = () => { el.textContent = fmt(target) + suffix; };
   if (reducedMotion() || !Number.isFinite(target)) return done();
   const start = performance.now();
   const tick = (now) => {
     const t = Math.min((now - start) / duration, 1);
     const eased = 1 - Math.pow(1 - t, 3);
-    el.textContent = (target * eased).toFixed(decimals) + suffix;
+    el.textContent = fmt(target * eased) + suffix;
     if (t < 1) requestAnimationFrame(tick); else done();
   };
   requestAnimationFrame(tick);

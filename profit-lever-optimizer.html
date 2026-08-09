@@ -9,6 +9,29 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/brand.css">
+<style>
+/* Lever comparison bars (page-local) */
+.lever-list { display: grid; gap: 1.05rem; margin-top: .5rem; }
+.lever-item { padding-bottom: 1rem; border-bottom: 1px solid var(--light-sage); }
+.lever-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.lever-top { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+.lever-name { font-weight: 600; color: var(--navy); font-size: .98rem; }
+.lever-amt { margin-left: auto; font-weight: 700; color: var(--dark); font-variant-numeric: tabular-nums; }
+.lever-amt em { font-style: normal; font-weight: 400; font-size: .8rem; color: var(--grey-light); }
+.lever-opp { font-size: .72rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: .14rem .6rem; border-radius: 999px; }
+.opp-High { background: #e7f2ea; color: var(--healthy); }
+.opp-Medium { background: #f8efdd; color: var(--watch); }
+.opp-Low { background: #eef1f1; color: var(--grey-light); }
+.lever-track { height: 14px; border-radius: 999px; background: var(--mint); overflow: hidden; margin: .5rem 0 .55rem; }
+.lever-fill { display: block; height: 100%; min-width: 8px; border-radius: 999px; }
+.fill-High { background: var(--healthy); }
+.fill-Medium { background: var(--watch); }
+.fill-Low { background: #b9c6c5; }
+.lever-why { font-size: .85rem; color: var(--grey-light); line-height: 1.55; }
+.lever-rec { font-size: .72rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: .14rem .6rem; border-radius: 999px; background: var(--navy); color: var(--white); }
+body.print-report .lever-item { break-inside: avoid; }
+body.print-report .lever-track { height: 10px; }
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -27,11 +50,14 @@
     <fieldset>
       <legend>Business basics</legend>
       <div class="field"><label for="monthlyRevenue">Monthly revenue ($)</label>
-        <input id="monthlyRevenue" name="monthlyRevenue" type="number" min="0" step="any" required></div>
+        <input id="monthlyRevenue" name="monthlyRevenue" type="number" min="0" step="any" required>
+        <p class="hint">A typical month is fine — don't average your best one.</p></div>
       <div class="field"><label for="profitMargin">Profit margin, roughly (%, optional)</label>
-        <input id="profitMargin" name="profitMargin" type="number" min="-100" max="100" step="any"></div>
+        <input id="profitMargin" name="profitMargin" type="number" min="-100" max="100" step="any">
+        <p class="hint">Your best guess works. If you ran the Profit Margin Check in Step 1, use that number.</p></div>
       <div class="field"><label for="activeClients">Active clients (optional)</label>
-        <input id="activeClients" name="activeClients" type="number" min="0" step="1"></div>
+        <input id="activeClients" name="activeClients" type="number" min="0" step="1">
+        <p class="hint">Anyone you've billed in the last 90 days.</p></div>
       <div class="field"><label for="gutFeeling">Gut check: doubling your profit feels like a…</label>
         <select id="gutFeeling" name="gutFeeling">
           <option value="not sure" selected>Not sure</option>
@@ -39,7 +65,8 @@
           <option value="efficiency">Efficiency problem</option>
           <option value="client retention">Client retention problem</option>
           <option value="too much low-margin work">Too-much-low-margin-work problem</option>
-        </select></div>
+        </select>
+        <p class="hint">Go with your instinct — the report will tell you whether the numbers agree.</p></div>
     </fieldset>
 
     <fieldset>
@@ -51,22 +78,26 @@
           <option value="1-2 years">1–2 years ago</option>
           <option value="2+ years">2+ years ago</option>
           <option value="never">Never</option>
-        </select></div>
+        </select>
+        <p class="hint">An across-the-board raise — bumping one client's rate doesn't count.</p></div>
       <div class="field"><label for="pricingBasis">How did you set your current rates?</label>
         <select id="pricingBasis" name="pricingBasis">
           <option value="calculated from costs and target margin">Calculated from costs + target margin</option>
           <option value="matched competitors">Matched what competitors charge</option>
           <option value="gut feel">Gut feel</option>
           <option value="grandfathered">Grandfathered — haven't revisited in years</option>
-        </select></div>
+        </select>
+        <p class="hint">Most owners answer "matched competitors" — and that's usually where the money is hiding.</p></div>
       <div class="field"><label for="loseOnPrice">How often do you lose work on price?</label>
         <select id="loseOnPrice" name="loseOnPrice">
           <option value="often">Often</option>
           <option value="sometimes">Sometimes</option>
           <option value="rarely">Rarely</option>
-        </select></div>
+        </select>
+        <p class="hint">"Rarely" isn't a badge of honor — it's often a sign you're underpriced.</p></div>
       <div class="field"><label for="pricingNote">Anything else about your pricing? (optional)</label>
-        <input id="pricingNote" name="pricingNote" maxlength="300"></div>
+        <input id="pricingNote" name="pricingNote" maxlength="300">
+        <p class="hint">Whatever you'd tell a coach — "haven't touched retainer rates since 2022" is exactly the kind of thing.</p></div>
     </fieldset>
 
     <fieldset>
@@ -76,36 +107,44 @@
           <option value="documented">Yes — documented</option>
           <option value="partial">Partially</option>
           <option value="in my head">No — it's in my head</option>
-        </select></div>
+        </select>
+        <p class="hint">The test: could a new hire run a job from your docs alone? If not, pick "Partially."</p></div>
       <div class="field"><label for="ownerLowValueHours">Your hours per week on work someone cheaper could do (0 if none)</label>
-        <input id="ownerLowValueHours" name="ownerLowValueHours" type="number" min="0" step="any" value="0"></div>
+        <input id="ownerLowValueHours" name="ownerLowValueHours" type="number" min="0" step="any" value="0">
+        <p class="hint">Scheduling, invoicing, chasing paperwork — the hours a $25/hr hire could take off your plate.</p></div>
       <div class="field"><label for="efficiencyNote">Your most time-consuming service to deliver? (optional)</label>
-        <input id="efficiencyNote" name="efficiencyNote" maxlength="300"></div>
+        <input id="efficiencyNote" name="efficiencyNote" maxlength="300">
+        <p class="hint">The one that eats the most hours for every dollar it brings in.</p></div>
     </fieldset>
 
     <fieldset>
       <legend>Lever 3 — Client value</legend>
       <div class="field"><label for="repeatRevenuePct">Share of revenue from repeat clients (%, optional)</label>
-        <input id="repeatRevenuePct" name="repeatRevenuePct" type="number" min="0" max="100" step="any"></div>
+        <input id="repeatRevenuePct" name="repeatRevenuePct" type="number" min="0" max="100" step="any">
+        <p class="hint">Rough is fine — is it closer to 10% or 60%?</p></div>
       <div class="field"><label for="recurringRevenue">Any recurring revenue — retainers, subscriptions, maintenance plans?</label>
         <select id="recurringRevenue" name="recurringRevenue">
           <option value="no">No</option>
           <option value="yes">Yes</option>
-        </select></div>
+        </select>
+        <p class="hint">Money that arrives on a schedule, without a new sale every time.</p></div>
       <div class="field"><label for="clientValueNote">A service clients need repeatedly but don't know to ask for? (optional)</label>
-        <input id="clientValueNote" name="clientValueNote" maxlength="300"></div>
+        <input id="clientValueNote" name="clientValueNote" maxlength="300">
+        <p class="hint">Think annual re-tests, maintenance checks, seasonal service — things they only remember when something breaks.</p></div>
     </fieldset>
 
     <fieldset>
       <legend>Lever 4 — Low-profit work</legend>
       <div class="field"><label for="dreadedWork">Work that's always more effort than it's worth? (optional)</label>
-        <input id="dreadedWork" name="dreadedWork" maxlength="300"></div>
+        <input id="dreadedWork" name="dreadedWork" maxlength="300">
+        <p class="hint">The jobs you sigh at when they come in — name them.</p></div>
       <div class="field"><label for="marginVariance">Across your last 10 jobs, how consistent were the margins?</label>
         <select id="marginVariance" name="marginVariance">
           <option value="no idea">No idea</option>
           <option value="wide swings">Wide swings</option>
           <option value="fairly consistent">Fairly consistent</option>
-        </select></div>
+        </select>
+        <p class="hint">If you've never compared job margins, "No idea" is the honest answer — and a finding in itself.</p></div>
     </fieldset>
 
     <fieldset>
@@ -145,8 +184,6 @@ import { initTool, esc, money, countUp, printReport } from "./assets/js/tool-ui.
 import { initGate } from "./assets/js/member-gate.js";
 initGate();
 
-const OPP_CLS = { High: "status-healthy", Medium: "status-watch" };
-
 initTool({
   toolId: "profit-lever-optimizer",
   collect(form) {
@@ -168,19 +205,33 @@ initTool({
       </div>`;
   },
   renderReport(r) {
-    const rows = r.levers.map((l) => `
-      <tr><td>${esc(l.lever)}</td>
-        <td><span class="${OPP_CLS[l.opportunity] ?? ""}">${esc(l.opportunity)}</span></td>
-        <td>${money(l.monthlyImpact)}/mo</td>
-        <td>${esc(l.rationale)}</td></tr>`).join("");
+    const levers = [...r.levers].sort((a, b) => (b.monthlyImpact || 0) - (a.monthlyImpact || 0));
+    const max = Math.max(1, ...levers.map((l) => l.monthlyImpact || 0));
+    const oppSafe = (o) => ({ High: "High", Medium: "Medium", Low: "Low" })[o] ?? "Low";
+    const bars = levers.map((l) => {
+      const opp = oppSafe(l.opportunity);
+      const w = Math.max(4, Math.round((l.monthlyImpact || 0) / max * 100));
+      return `
+      <div class="lever-item">
+        <div class="lever-top">
+          <span class="lever-name">${esc(l.lever)}</span>
+          <span class="lever-opp opp-${opp}">${esc(l.opportunity)}</span>
+          ${l.lever === r.recommended ? `<span class="lever-rec">Your lever</span>` : ""}
+          <span class="lever-amt">${money(l.monthlyImpact)} <em>/mo</em></span>
+        </div>
+        <div class="lever-track"><span class="lever-fill fill-${opp}" style="width:${w}%"></span></div>
+        <p class="lever-why">${esc(l.rationale)}</p>
+      </div>`;
+    }).join("");
     const plan = r.plan_30day.map((a) => `<li>${esc(a)}</li>`).join("");
     return `
       <div class="card sp-7"><h2>🎯 Why this lever</h2><p>${esc(r.reason)}</p></div>
-      <div class="card sp-5 tint-mint"><h2>⚙️ Your 30-day plan</h2><ol class="actions">${plan}</ol></div>
-      <div class="card"><h2>📊 All four levers, rated</h2>
-        <table class="metric-table"><tr><th>Lever</th><th>Opportunity</th><th>Est. impact</th><th>Why</th></tr>${rows}</table>
+      <div class="card sp-5 tint-amber"><h2>📈 Your 30-day target</h2><p>${esc(r.target)}</p></div>
+      <div class="card sp-7"><h2>📊 All four levers, side by side</h2>
+        <div class="lever-list">${bars}</div>
+        <p class="flow-note">Bar length compares estimated monthly impact, scaled to your top lever.</p>
       </div>
-      <div class="card tint-amber"><h2>📈 Your 30-day target</h2><p>${esc(r.target)}</p></div>
+      <div class="card sp-5 tint-mint"><h2>⚙️ Your 30-day plan</h2><ol class="actions">${plan}</ol></div>
       <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {

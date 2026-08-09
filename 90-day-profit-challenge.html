@@ -9,6 +9,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/brand.css">
+<style>
+/* Page-local: quarter-over-quarter delta cells */
+.qoq { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem 1.25rem; margin-top: .75rem; }
+.qoq-cell { display: grid; gap: .1rem; justify-items: start; border-left: 3px solid var(--light-sage); padding-left: .9rem; }
+.qoq-label { font-size: .74rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--navy); }
+.qoq-now { font-family: var(--serif); font-size: 1.65rem; color: var(--dark); font-variant-numeric: tabular-nums; line-height: 1.15; }
+.qoq-was { font-size: .78rem; color: var(--grey-light); }
+.delta-chip { display: inline-block; margin-top: .35rem; font-size: .76rem; font-weight: 700; border-radius: 999px; padding: .14rem .6rem; white-space: nowrap; }
+.chip-good { background: #e7f2ea; color: var(--healthy); }
+.chip-bad { background: #f8e4e4; color: var(--critical); }
+.hero-stat .flow { margin-top: 1.35rem; text-align: left; }
+.hero-stat .sub .delta-chip { margin-top: 0; vertical-align: .05em; }
+/* Page-local: cadence timeline */
+.cadence-timeline { display: flex; align-items: stretch; gap: .6rem; flex-wrap: wrap; margin: .9rem 0 1rem; }
+.tl-step { flex: 1 1 150px; background: var(--mint); border: 1px solid #d3e9e7; border-radius: var(--radius-sm); padding: .7rem .95rem; }
+.tl-step .tl-k { display: block; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--teal); }
+.tl-step .tl-v { display: block; font-family: var(--serif); font-size: 1.08rem; color: var(--navy); line-height: 1.25; margin: .1rem 0; }
+.tl-step .tl-s { display: block; font-size: .78rem; color: var(--grey-light); line-height: 1.4; }
+.tl-arrow { align-self: center; color: var(--sage-dark); font-weight: 700; }
+.verdict-caption { font-size: .95rem; margin-bottom: .1rem; }
+@media (max-width: 560px) {
+  .cadence-timeline { flex-direction: column; }
+  .tl-arrow { align-self: flex-start; margin-left: .95rem; transform: rotate(90deg); }
+}
+@media print {
+  body.print-report .cadence-timeline { display: block; }
+  body.print-report .tl-step { margin-bottom: 6pt; break-inside: avoid; }
+  body.print-report .tl-arrow { display: none; }
+  body.print-report .qoq-cell { break-inside: avoid; }
+}
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -27,27 +58,34 @@
     <fieldset>
       <legend>The last 90 days</legend>
       <div class="field"><label for="revenue">Total revenue for the quarter ($)</label>
-        <input id="revenue" name="revenue" type="number" min="1" step="any" required></div>
+        <input id="revenue" name="revenue" type="number" min="1" step="any" required>
+        <p class="hint">All money that came in over the last 90 days, before anything went out.</p></div>
       <div class="field"><label for="expenses">Total expenses for the quarter ($ — everything, including your own pay)</label>
-        <input id="expenses" name="expenses" type="number" min="0" step="any" required></div>
+        <input id="expenses" name="expenses" type="number" min="0" step="any" required>
+        <p class="hint">Everything, including what you paid yourself. Estimates are fine — the pattern matters more than the precision.</p></div>
     </fieldset>
 
     <fieldset>
       <legend>The quarter before that (optional — skip if you don't have it)</legend>
       <div class="field"><label for="priorRevenue">Prior quarter's revenue ($)</label>
-        <input id="priorRevenue" name="priorRevenue" type="number" min="0" step="any"></div>
+        <input id="priorRevenue" name="priorRevenue" type="number" min="0" step="any">
+        <p class="hint">The 90 days before that. With it, your report shows the trend — not just a snapshot.</p></div>
       <div class="field"><label for="priorExpenses">Prior quarter's expenses ($)</label>
-        <input id="priorExpenses" name="priorExpenses" type="number" min="0" step="any"></div>
+        <input id="priorExpenses" name="priorExpenses" type="number" min="0" step="any">
+        <p class="hint">Same rule as above — everything, including your own pay.</p></div>
     </fieldset>
 
     <fieldset>
       <legend>Three diagnostic questions (optional — but this is where the plan gets sharp)</legend>
       <div class="field"><label for="helped">What most helped your profit this quarter?</label>
-        <textarea id="helped" name="helped" rows="2" maxlength="400"></textarea></div>
+        <textarea id="helped" name="helped" rows="2" maxlength="400"></textarea>
+        <p class="hint">A price increase, a big contract, a cost you finally cut — whatever actually moved the needle.</p></div>
       <div class="field"><label for="hurt">What most hurt it?</label>
-        <textarea id="hurt" name="hurt" rows="2" maxlength="400"></textarea></div>
+        <textarea id="hurt" name="hurt" rows="2" maxlength="400"></textarea>
+        <p class="hint">A no-show, a job that ran over, a slow month. Name the leak — the plan will plug it.</p></div>
       <div class="field"><label for="pattern">One pattern you noticed across most weeks or months?</label>
-        <textarea id="pattern" name="pattern" rows="2" maxlength="400"></textarea></div>
+        <textarea id="pattern" name="pattern" rows="2" maxlength="400"></textarea>
+        <p class="hint">e.g. "The first week of every month is dead." Patterns are where the plan gets its edge.</p></div>
     </fieldset>
 
     <fieldset>
@@ -60,7 +98,8 @@
           <option value="cut expenses">Cut expenses</option>
           <option value="add recurring revenue">Add recurring revenue</option>
           <option value="not sure — recommend for me">Not sure — recommend for me</option>
-        </select></div>
+        </select>
+        <p class="hint">"Not sure" is a fine answer — we'll pick the highest-leverage focus from your numbers.</p></div>
       <div class="field"><label for="checkDay">What day of the week works for your 5-minute profit check?</label>
         <select id="checkDay" name="checkDay" required>
           <option value="" disabled selected>Pick a day…</option>
@@ -69,9 +108,11 @@
           <option>Wednesday</option>
           <option>Thursday</option>
           <option>Friday</option>
-        </select></div>
+        </select>
+        <p class="hint">Five minutes, same day every week. Pick the day you're most reliably at your desk.</p></div>
       <div class="field"><label for="obstacle">What's most likely to get in the way? (optional)</label>
-        <textarea id="obstacle" name="obstacle" rows="2" maxlength="400"></textarea></div>
+        <textarea id="obstacle" name="obstacle" rows="2" maxlength="400"></textarea>
+        <p class="hint">Busy season, a hire, a cash crunch. Name it now and the plan pre-decides your response.</p></div>
     </fieldset>
 
     <fieldset>
@@ -107,7 +148,7 @@
 </footer>
 
 <script type="module">
-import { initTool, esc, money, countUp, printReport } from "./assets/js/tool-ui.js";
+import { initTool, esc, money, countUp, flowBar, gaugeSVG, printReport } from "./assets/js/tool-ui.js";
 import { initGate } from "./assets/js/member-gate.js";
 initGate();
 
@@ -122,8 +163,21 @@ const verdictClass = (v) =>
   v === "strong" || v === "solid" ? "status-healthy" : v === "functional" ? "status-watch" : "status-critical";
 
 const num = (n) => Number(document.querySelector(`[name=${n}]`)?.value) || 0;
-const delta = (v, suffix = "") =>
-  `<span class="${v >= 0 ? "status-healthy" : "status-critical"}">${v >= 0 ? "+" : "−"}${Math.abs(v)}${suffix}</span>`;
+// Delta chip: ▲/▼ + value, colored by whether the move is good (invert for expenses).
+const chip = (v, suffix = "", { invert = false, isMoney = false } = {}) => {
+  const up = v >= 0;
+  const good = invert ? !up : up;
+  const val = isMoney ? money(Math.abs(v)) : `${Math.abs(v)}${suffix}`;
+  return `<span class="delta-chip ${good ? "chip-good" : "chip-bad"}">${up ? "▲" : "▼"} ${val}</span>`;
+};
+const qoqCell = (label, prior, cur, chipHtml, fmt = money) => `
+  <div class="qoq-cell">
+    <span class="qoq-label">${label}</span>
+    <span class="qoq-now">${fmt(cur)}</span>
+    <span class="qoq-was">was ${fmt(prior)}</span>
+    ${chipHtml}
+  </div>`;
+const pct = (v) => `${esc(v)}%`;
 
 initTool({
   toolId: "90-day-profit-challenge",
@@ -135,37 +189,47 @@ initTool({
   renderMetrics(m) {
     const netCls = m.netProfit >= 0 ? "status-healthy" : "status-critical";
     const netSign = m.netProfit < 0 ? "−" : "";
+    const rev = num("revenue"), exp = num("expenses");
+    const bar = flowBar("💸 Where the quarter's revenue went", [
+      { label: "Expenses", value: exp, cls: "fs-navy" },
+      { label: "Profit kept", value: m.netProfit, cls: "fs-green" },
+    ]);
     let compare;
     if (m.prior) {
       const p = m.prior;
+      const expPct = p.priorExpenses > 0 ? Math.round(((exp - p.priorExpenses) / p.priorExpenses) * 1000) / 10 : null;
       compare = `
       <div class="card"><h2>📊 Quarter over quarter</h2>
-        <table class="metric-table">
-          <tr><th>Metric</th><th>Prior quarter</th><th>This quarter</th><th>Change</th></tr>
-          <tr><th>Revenue</th><td class="num">${money(p.priorRevenue)}</td><td class="num">${money(num("revenue"))}</td><td>${delta(p.revenueChangePct, "%")}</td></tr>
-          <tr><th>Expenses</th><td class="num">${money(p.priorExpenses)}</td><td class="num">${money(num("expenses"))}</td><td></td></tr>
-          <tr><th>Net profit</th><td class="num">${money(p.priorNet)}</td><td class="num">${money(m.netProfit)}</td><td></td></tr>
-          <tr><th>Margin</th><td class="num">${esc(p.priorMargin)}%</td><td class="num">${esc(m.margin)}%</td><td>${delta(p.marginChangePts, " pts")}</td></tr>
-        </table>
+        <div class="qoq">
+          ${qoqCell("Revenue", p.priorRevenue, rev, chip(p.revenueChangePct, "%"))}
+          ${qoqCell("Expenses", p.priorExpenses, exp, expPct === null ? "" : chip(expPct, "%", { invert: true }))}
+          ${qoqCell("Net profit", p.priorNet, m.netProfit, chip(Math.round(m.netProfit - p.priorNet), "", { isMoney: true }))}
+          ${qoqCell("Margin", p.priorMargin, m.margin, chip(p.marginChangePts, " pts"), pct)}
+        </div>
       </div>`;
     } else {
       compare = `<div class="card"><h2>📊 Your baseline</h2>
         <p>No prior quarter to compare — this quarter becomes your baseline. Run this review again in 90 days and the comparison starts working for you.</p></div>`;
     }
     return `
-      <div class="card sp-6 hero-stat">
+      <div class="card sp-5">
+        <h2>📊 Last quarter's margin</h2>
+        <div class="gauge-wrap">
+          ${gaugeSVG(m.margin)}
+          <div id="margin-count" class="big-number gauge-num ${verdictClass(m.verdict)}">0%</div>
+        </div>
+        <p class="gauge-caption verdict-caption ${verdictClass(m.verdict)}">${esc(VERDICT_WORD[m.verdict] ?? m.verdict)}</p>
+        <p class="gauge-caption">under 10% needs attention · 10–20% thin · 20%+ healthy</p>
+      </div>
+      <div class="hero-stat sp-7">
         <div class="sub">Last quarter's net profit</div>
         <div class="big-number ${netCls}">${netSign}$<span id="net-count">0</span></div>
-        <div class="sub">on ${money(num("revenue"))} in revenue</div>
-      </div>
-      <div class="card sp-6 hero-stat">
-        <div class="sub">Margin</div>
-        <div class="big-number ${verdictClass(m.verdict)}"><span id="margin-count">0</span></div>
-        <div class="sub">${esc(VERDICT_WORD[m.verdict] ?? m.verdict)}</div>
+        <div class="sub">on ${money(rev)} in revenue${m.prior ? ` · ${chip(Math.round(m.netProfit - m.prior.priorNet), "", { isMoney: true })} vs prior quarter` : ""}</div>
+        ${bar}
       </div>
       ${compare}`;
   },
-  renderReport(r) {
+  renderReport(r, m) {
     const tints = ["tint-mint", "tint-sage", "tint-amber"];
     const levers = r.levers.map((l, i) => `
       <div class="card sp-4 ${tints[i % 3]}"><h2>⚙️ Lever ${i + 1}: ${esc(l.name)}</h2>
@@ -173,16 +237,28 @@ initTool({
         <p><strong>Target</strong> — ${esc(l.target)}</p>
         <p><strong>Month 1</strong> — ${esc(l.month1)}</p>
       </div>`).join("");
+    const checkDay = document.querySelector("[name=checkDay]")?.value || "week";
+    const timeline = `
+      <div class="cadence-timeline">
+        <div class="tl-step"><span class="tl-k">Weekly</span><span class="tl-v">Every ${esc(checkDay)}</span><span class="tl-s">5-minute profit check</span></div>
+        <span class="tl-arrow">→</span>
+        <div class="tl-step"><span class="tl-k">Day 45</span><span class="tl-v">${esc(m.midDate || "Mid-quarter")}</span><span class="tl-s">Mid-quarter P&amp;L review</span></div>
+        <span class="tl-arrow">→</span>
+        <div class="tl-step"><span class="tl-k">Day 90</span><span class="tl-v">${esc(m.endDate || "Quarter's end")}</span><span class="tl-s">Full re-review — run this again</span></div>
+      </div>`;
     return `
       <div class="card sp-7"><h2>🔍 The quarter, read honestly</h2><p>${esc(r.verdict_read)}</p></div>
       <div class="card sp-5 tint-navy"><h2>🎯 The one goal</h2><p class="closing">${esc(r.goal)}</p></div>
       ${levers}
-      <div class="card sp-6"><h2>📅 The cadence</h2><p>${esc(r.cadence)}</p></div>
-      <div class="card sp-6 tint-amber"><h2>🧱 The obstacle, pre-decided</h2><p>${esc(r.contingency)}</p></div>
+      <div class="card sp-7"><h2>📅 The cadence</h2>${timeline}<p>${esc(r.cadence)}</p></div>
+      <div class="card sp-5 tint-amber"><h2>🧱 The obstacle, pre-decided</h2><p>${esc(r.contingency)}</p></div>
       <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {
-    countUp(document.getElementById("net-count"), Math.abs(Math.round(m.netProfit)));
+    const netEl = document.getElementById("net-count");
+    const net = Math.abs(Math.round(m.netProfit));
+    countUp(netEl, net);
+    setTimeout(() => { netEl.textContent = net.toLocaleString("en-US"); }, 900); // add thousands separator once the count settles
     countUp(document.getElementById("margin-count"), m.margin, { suffix: "%" });
   },
 });

@@ -9,6 +9,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/brand.css">
+<style>
+  /* Phase-in timeline (page-local) */
+  .phase-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; margin-top: 1.1rem; }
+  @media (max-width: 760px) { .phase-steps { grid-template-columns: repeat(2, 1fr); } }
+  .phase-step { background: var(--white); border: 1px solid var(--light-sage); border-radius: var(--radius-sm); padding: .95rem 1rem .85rem; box-shadow: var(--shadow-card); }
+  .phase-step.is-target { background: #e7f2ea; border-color: #cde4d4; }
+  .ph-name { font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--navy); }
+  .is-target .ph-name { color: var(--healthy); }
+  .ph-bar { display: flex; gap: 2px; height: 8px; border-radius: 999px; background: var(--light-sage); overflow: hidden; margin: .6rem 0 .7rem; }
+  .ph-bar i { display: block; min-width: 3px; }
+  .ph-line { display: flex; align-items: baseline; gap: .45rem; font-size: .84rem; color: var(--grey); padding: .18rem 0; }
+  .ph-line strong { font-variant-numeric: tabular-nums; color: var(--dark); margin-left: auto; }
+  .ph-line em { font-style: normal; font-variant-numeric: tabular-nums; font-size: .78rem; color: var(--grey-light); }
+  /* Stack two short cards beside one tall one */
+  .report .col-stack { display: grid; gap: 1.25rem; grid-auto-rows: 1fr; grid-column: 1 / -1; }
+  @media (min-width: 900px) { .report .col-stack.sp-5 { grid-column: span 5; } }
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -26,28 +43,49 @@
   <form id="tool-form" class="tool-form" novalidate>
     <fieldset>
       <legend>Your revenue</legend>
-      <div class="field"><label for="monthlyRevenue">Monthly revenue ($)</label>
-        <input id="monthlyRevenue" name="monthlyRevenue" type="number" min="1" step="any" required></div>
-      <div class="field"><label for="cogs">Direct job costs — materials, subs, field labour ($ — $0 if pure service)</label>
-        <input id="cogs" name="cogs" type="number" min="0" step="any" required></div>
+      <div class="field">
+        <label for="monthlyRevenue">Monthly revenue ($)</label>
+        <input id="monthlyRevenue" name="monthlyRevenue" type="number" min="1" step="any" required>
+        <p class="hint">A typical month, before any expenses. If it swings, average your last 3 months.</p>
+      </div>
+      <div class="field">
+        <label for="cogs">Direct job costs per month ($)</label>
+        <input id="cogs" name="cogs" type="number" min="0" step="any" required>
+        <p class="hint">Field labor, subs, materials, disposal — costs you only have because you took the job. Pure service with no delivery costs? Use 0.</p>
+      </div>
     </fieldset>
 
     <fieldset>
       <legend>Your spending today</legend>
-      <div class="field"><label for="totalOpex">Total monthly operating expenses — INCLUDING any pay you take that's mixed in ($)</label>
-        <input id="totalOpex" name="totalOpex" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="ownerPayMonthly">What you currently pay yourself per month ($ — 0 is fine)</label>
-        <input id="ownerPayMonthly" name="ownerPayMonthly" type="number" min="0" step="any" required></div>
-      <div class="field"><label for="taxSetAside">What you currently set aside for taxes per month ($ — 0 is fine, no judgment)</label>
-        <input id="taxSetAside" name="taxSetAside" type="number" min="0" step="any" required></div>
+      <div class="field">
+        <label for="totalOpex">Total monthly operating expenses ($)</label>
+        <input id="totalOpex" name="totalOpex" type="number" min="0" step="any" required>
+        <p class="hint">Rent, software, admin, insurance, marketing, vehicles — everything it costs to keep the doors open. If your own pay is mixed into this pot, leave it in; we'll pull it apart.</p>
+      </div>
+      <div class="field">
+        <label for="ownerPayMonthly">What you currently pay yourself per month ($)</label>
+        <input id="ownerPayMonthly" name="ownerPayMonthly" type="number" min="0" step="any" required>
+        <p class="hint">Salary or draws — what actually lands in your personal account. If it's 0, enter 0; we'll show you the benchmark for a business your size.</p>
+      </div>
+      <div class="field">
+        <label for="taxSetAside">What you currently set aside for taxes per month ($)</label>
+        <input id="taxSetAside" name="taxSetAside" type="number" min="0" step="any" required>
+        <p class="hint">Money you actually move somewhere and don't touch. If tax time is a scramble, this is probably 0 — no judgment, that's exactly what this fixes.</p>
+      </div>
     </fieldset>
 
     <fieldset>
       <legend>The context behind the numbers (optional — but it sharpens the plan)</legend>
-      <div class="field"><label for="accountsNote">How are your business bank accounts set up today?</label>
-        <textarea id="accountsNote" name="accountsNote" rows="2" maxlength="400" placeholder="e.g. One checking account, everything runs through it"></textarea></div>
-      <div class="field"><label for="worryNote">What worries you most about how money moves through the business?</label>
-        <textarea id="worryNote" name="worryNote" rows="2" maxlength="400"></textarea></div>
+      <div class="field">
+        <label for="accountsNote">How are your business bank accounts set up today?</label>
+        <textarea id="accountsNote" name="accountsNote" rows="2" maxlength="400" placeholder="e.g. One checking account, everything runs through it"></textarea>
+        <p class="hint">One account or five, personal card mixed in — describe it as it is. The plan starts from where you actually are.</p>
+      </div>
+      <div class="field">
+        <label for="worryNote">What worries you most about how money moves through the business?</label>
+        <textarea id="worryNote" name="worryNote" rows="2" maxlength="400"></textarea>
+        <p class="hint">Cash crunches, tax surprises, paying yourself last — whatever keeps you checking the balance at night.</p>
+      </div>
     </fieldset>
 
     <fieldset>
@@ -101,6 +139,26 @@ function allocationTable(m) {
   </table>`;
 }
 
+function phaseTimeline(m) {
+  if (!m.phaseIn || !Array.isArray(m.phases) || !m.phases.length) return "";
+  const maxTotal = Math.max(...m.phases.map((p) => (Number(p.profitPct) || 0) + (Number(p.taxesPct) || 0))) || 1;
+  const steps = m.phases.map((p, i) => {
+    const target = i === m.phases.length - 1;
+    const pw = ((Number(p.profitPct) || 0) / maxTotal) * 100;
+    const tw = ((Number(p.taxesPct) || 0) / maxTotal) * 100;
+    return `<div class="phase-step${target ? " is-target" : ""}">
+      <div class="ph-name">${esc(p.name)}</div>
+      <div class="ph-bar"><i class="fs-green" style="width:${pw}%"></i><i class="fs-amber" style="width:${tw}%"></i></div>
+      <div class="ph-line"><span>Profit</span> <em>${money(p.profitAmt)}/mo</em><strong>${esc(p.profitPct)}%</strong></div>
+      <div class="ph-line"><span>Taxes</span> <em>${money(p.taxesAmt)}/mo</em><strong>${esc(p.taxesPct)}%</strong></div>
+    </div>`;
+  }).join("");
+  return `<div class="card"><h2>📈 Your phase-in schedule</h2>
+    <p class="flow-note" style="margin-top:0">Transfers ramp up every two months — small enough to start today, and at target by month 7.</p>
+    <div class="phase-steps">${steps}</div>
+  </div>`;
+}
+
 initTool({
   toolId: "profit-first-setup",
   collect(form) {
@@ -128,15 +186,18 @@ initTool({
       </div>
       <div class="card">${bar}${allocationTable(m)}</div>`;
   },
-  renderReport(r) {
+  renderReport(r, m) {
     return `
-      <div class="card sp-7"><h2>🔍 Your allocation, read against reality</h2><p>${esc(r.readout)}</p></div>
-      <div class="card sp-5 tint-amber"><h2>🪜 Your starting point</h2><p>${esc(r.phase_plan)}</p></div>
-      <div class="card sp-6 tint-mint"><h2>🏦 Set up the accounts</h2>
+      <div class="card sp-6"><h2>🔍 Your allocation, read against reality</h2><p>${esc(r.readout)}</p></div>
+      <div class="card sp-6 tint-amber"><h2>🪜 Your starting point</h2><p>${esc(r.phase_plan)}</p></div>
+      ${phaseTimeline(m)}
+      <div class="card sp-7 tint-mint"><h2>🏦 Set up the accounts</h2>
         <ol class="actions">${r.account_steps.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>
       </div>
-      <div class="card sp-6 tint-sage"><h2>🔁 The transfer habit</h2><p>${esc(r.transfer_habit)}</p></div>
-      <div class="card tint-amber"><h2>🎯 First milestone</h2><p>${esc(r.first_milestone)}</p></div>
+      <div class="col-stack sp-5">
+        <div class="card tint-sage"><h2>🔁 The transfer habit</h2><p>${esc(r.transfer_habit)}</p></div>
+        <div class="card tint-amber"><h2>🎯 First milestone</h2><p>${esc(r.first_milestone)}</p></div>
+      </div>
       <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
   },
   onReady(_r, m) {
