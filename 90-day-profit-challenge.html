@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>90-Day Profit Challenge — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <span class="step-tag">Step 8 of 8</span>
+  <h1>90-Day Profit Challenge</h1>
+  <p class="intro">The past quarter is data. The next quarter is the decision. Enter the last 90 days of numbers, answer three quick questions, and get a focused 90-day plan: one measurable profit goal, three levers, and a weekly tracking cadence — with your mid-quarter check date already on the calendar.</p>
+
+  <div id="form-error" hidden></div>
+  <div id="form-progress"></div>
+
+  <form id="tool-form" class="tool-form" novalidate>
+    <fieldset>
+      <legend>The last 90 days</legend>
+      <div class="field"><label for="revenue">Total revenue for the quarter ($)</label>
+        <input id="revenue" name="revenue" type="number" min="1" step="any" required></div>
+      <div class="field"><label for="expenses">Total expenses for the quarter ($ — everything, including your own pay)</label>
+        <input id="expenses" name="expenses" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>The quarter before that (optional — skip if you don't have it)</legend>
+      <div class="field"><label for="priorRevenue">Prior quarter's revenue ($)</label>
+        <input id="priorRevenue" name="priorRevenue" type="number" min="0" step="any"></div>
+      <div class="field"><label for="priorExpenses">Prior quarter's expenses ($)</label>
+        <input id="priorExpenses" name="priorExpenses" type="number" min="0" step="any"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Three diagnostic questions (optional — but this is where the plan gets sharp)</legend>
+      <div class="field"><label for="helped">What most helped your profit this quarter?</label>
+        <textarea id="helped" name="helped" rows="2" maxlength="400"></textarea></div>
+      <div class="field"><label for="hurt">What most hurt it?</label>
+        <textarea id="hurt" name="hurt" rows="2" maxlength="400"></textarea></div>
+      <div class="field"><label for="pattern">One pattern you noticed across most weeks or months?</label>
+        <textarea id="pattern" name="pattern" rows="2" maxlength="400"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>The next 90 days</legend>
+      <div class="field"><label for="goalFocus">What should the next 90 days focus on?</label>
+        <select id="goalFocus" name="goalFocus" required>
+          <option value="" disabled selected>Choose a focus…</option>
+          <option value="grow the margin">Grow the margin</option>
+          <option value="hit a net profit number">Hit a net profit number</option>
+          <option value="cut expenses">Cut expenses</option>
+          <option value="add recurring revenue">Add recurring revenue</option>
+          <option value="not sure — recommend for me">Not sure — recommend for me</option>
+        </select></div>
+      <div class="field"><label for="checkDay">What day of the week works for your 5-minute profit check?</label>
+        <select id="checkDay" name="checkDay" required>
+          <option value="" disabled selected>Pick a day…</option>
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+        </select></div>
+      <div class="field"><label for="obstacle">What's most likely to get in the way? (optional)</label>
+        <textarea id="obstacle" name="obstacle" rows="2" maxlength="400"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Unlock your report</legend>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+        <p class="hint">Your report appears right here on this page — and we'll email you a copy to keep.</p>
+      </div>
+    </fieldset>
+    <button class="btn" type="submit" data-label="Build my 90-day plan">Build my 90-day plan</button>
+    <p class="form-note">Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
+  </form>
+
+  <section id="report" class="report" hidden>
+    <div id="metrics"></div>
+    <div id="report-body"></div>
+    <button class="btn secondary pdf-btn" type="button">💾 Save report as PDF</button>
+    <div class="followup">
+      <h3>💬 Ask about your report</h3>
+      <p id="fu-counter"></p>
+      <div id="fu-thread"></div>
+      <div class="fu-row">
+        <input id="fu-input" type="text" maxlength="500" placeholder="e.g. How do I hit the Lever 1 target?">
+        <button id="fu-send" class="btn">Ask</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script type="module">
+import { initTool, esc, money, countUp, printReport } from "./assets/js/tool-ui.js";
+import { initGate } from "./assets/js/member-gate.js";
+initGate();
+
+const VERDICT_WORD = {
+  strong: "Strong quarter",
+  solid: "Solid quarter",
+  functional: "Functional — thin",
+  challenging: "Challenging quarter",
+  difficult: "Difficult quarter",
+};
+const verdictClass = (v) =>
+  v === "strong" || v === "solid" ? "status-healthy" : v === "functional" ? "status-watch" : "status-critical";
+
+const num = (n) => Number(document.querySelector(`[name=${n}]`)?.value) || 0;
+const delta = (v, suffix = "") =>
+  `<span class="${v >= 0 ? "status-healthy" : "status-critical"}">${v >= 0 ? "+" : "−"}${Math.abs(v)}${suffix}</span>`;
+
+initTool({
+  toolId: "90-day-profit-challenge",
+  collect(form) {
+    const data = {};
+    for (const el of form.querySelectorAll("[name]")) if (el.name !== "email") data[el.name] = el.value;
+    return data;
+  },
+  renderMetrics(m) {
+    const netCls = m.netProfit >= 0 ? "status-healthy" : "status-critical";
+    const netSign = m.netProfit < 0 ? "−" : "";
+    let compare;
+    if (m.prior) {
+      const p = m.prior;
+      compare = `
+      <div class="card"><h2>📊 Quarter over quarter</h2>
+        <table class="metric-table">
+          <tr><th>Metric</th><th>Prior quarter</th><th>This quarter</th><th>Change</th></tr>
+          <tr><th>Revenue</th><td class="num">${money(p.priorRevenue)}</td><td class="num">${money(num("revenue"))}</td><td>${delta(p.revenueChangePct, "%")}</td></tr>
+          <tr><th>Expenses</th><td class="num">${money(p.priorExpenses)}</td><td class="num">${money(num("expenses"))}</td><td></td></tr>
+          <tr><th>Net profit</th><td class="num">${money(p.priorNet)}</td><td class="num">${money(m.netProfit)}</td><td></td></tr>
+          <tr><th>Margin</th><td class="num">${esc(p.priorMargin)}%</td><td class="num">${esc(m.margin)}%</td><td>${delta(p.marginChangePts, " pts")}</td></tr>
+        </table>
+      </div>`;
+    } else {
+      compare = `<div class="card"><h2>📊 Your baseline</h2>
+        <p>No prior quarter to compare — this quarter becomes your baseline. Run this review again in 90 days and the comparison starts working for you.</p></div>`;
+    }
+    return `
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Last quarter's net profit</div>
+        <div class="big-number ${netCls}">${netSign}$<span id="net-count">0</span></div>
+        <div class="sub">on ${money(num("revenue"))} in revenue</div>
+      </div>
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Margin</div>
+        <div class="big-number ${verdictClass(m.verdict)}"><span id="margin-count">0</span></div>
+        <div class="sub">${esc(VERDICT_WORD[m.verdict] ?? m.verdict)}</div>
+      </div>
+      ${compare}`;
+  },
+  renderReport(r) {
+    const tints = ["tint-mint", "tint-sage", "tint-amber"];
+    const levers = r.levers.map((l, i) => `
+      <div class="card sp-4 ${tints[i % 3]}"><h2>⚙️ Lever ${i + 1}: ${esc(l.name)}</h2>
+        <p><strong>Action</strong> — ${esc(l.action)}</p>
+        <p><strong>Target</strong> — ${esc(l.target)}</p>
+        <p><strong>Month 1</strong> — ${esc(l.month1)}</p>
+      </div>`).join("");
+    return `
+      <div class="card sp-7"><h2>🔍 The quarter, read honestly</h2><p>${esc(r.verdict_read)}</p></div>
+      <div class="card sp-5 tint-navy"><h2>🎯 The one goal</h2><p class="closing">${esc(r.goal)}</p></div>
+      ${levers}
+      <div class="card sp-6"><h2>📅 The cadence</h2><p>${esc(r.cadence)}</p></div>
+      <div class="card sp-6 tint-amber"><h2>🧱 The obstacle, pre-decided</h2><p>${esc(r.contingency)}</p></div>
+      <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
+  },
+  onReady(_r, m) {
+    countUp(document.getElementById("net-count"), Math.abs(Math.round(m.netProfit)));
+    countUp(document.getElementById("margin-count"), m.margin, { suffix: "%" });
+  },
+});
+document.querySelector(".pdf-btn").addEventListener("click", () => printReport("90-Day Profit Challenge — The CEO Profit Shift"));
+</script>
+</body>
+</html>

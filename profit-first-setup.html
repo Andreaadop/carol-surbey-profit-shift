@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profit First Setup — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <span class="step-tag">Step 5 of 8</span>
+  <h1>Profit First Setup</h1>
+  <p class="intro">Every dollar coming into your business gets a destination before it gets spent. This tool calculates your Smart Profit Allocation System from your real numbers: four bank accounts — Operating Expenses, Profit, Taxes, and Owner's Pay — with your exact percentages and dollar amounts, plus a step-by-step plan to set them up. If your current spending doesn't fit the target yet, you get a phase-in schedule that starts where you are.</p>
+
+  <div id="form-error" hidden></div>
+  <div id="form-progress"></div>
+
+  <form id="tool-form" class="tool-form" novalidate>
+    <fieldset>
+      <legend>Your revenue</legend>
+      <div class="field"><label for="monthlyRevenue">Monthly revenue ($)</label>
+        <input id="monthlyRevenue" name="monthlyRevenue" type="number" min="1" step="any" required></div>
+      <div class="field"><label for="cogs">Direct job costs — materials, subs, field labour ($ — $0 if pure service)</label>
+        <input id="cogs" name="cogs" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your spending today</legend>
+      <div class="field"><label for="totalOpex">Total monthly operating expenses — INCLUDING any pay you take that's mixed in ($)</label>
+        <input id="totalOpex" name="totalOpex" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="ownerPayMonthly">What you currently pay yourself per month ($ — 0 is fine)</label>
+        <input id="ownerPayMonthly" name="ownerPayMonthly" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="taxSetAside">What you currently set aside for taxes per month ($ — 0 is fine, no judgment)</label>
+        <input id="taxSetAside" name="taxSetAside" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>The context behind the numbers (optional — but it sharpens the plan)</legend>
+      <div class="field"><label for="accountsNote">How are your business bank accounts set up today?</label>
+        <textarea id="accountsNote" name="accountsNote" rows="2" maxlength="400" placeholder="e.g. One checking account, everything runs through it"></textarea></div>
+      <div class="field"><label for="worryNote">What worries you most about how money moves through the business?</label>
+        <textarea id="worryNote" name="worryNote" rows="2" maxlength="400"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Unlock your report</legend>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+        <p class="hint">Your report appears right here on this page — and we'll email you a copy to keep.</p>
+      </div>
+    </fieldset>
+    <button class="btn" type="submit" data-label="Build my allocation plan">Build my allocation plan</button>
+    <p class="form-note">Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
+  </form>
+
+  <section id="report" class="report" hidden>
+    <div id="metrics"></div>
+    <div id="report-body"></div>
+    <button class="btn secondary pdf-btn" type="button">💾 Save report as PDF</button>
+    <div class="followup">
+      <h3>💬 Ask about your report</h3>
+      <p id="fu-counter"></p>
+      <div id="fu-thread"></div>
+      <div class="fu-row">
+        <input id="fu-input" type="text" maxlength="500" placeholder="e.g. Which bank should I open the profit account at?">
+        <button id="fu-send" class="btn">Ask</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script type="module">
+import { initTool, esc, money, countUp, flowBar, printReport } from "./assets/js/tool-ui.js";
+import { initGate } from "./assets/js/member-gate.js";
+initGate();
+
+function allocationTable(m) {
+  const cogsCls = m.cogsFlag ? (m.cogsPct > 50 ? "status-critical" : "status-watch") : "";
+  return `<table class="metric-table">
+    <tr><th>Line</th><th>%</th><th>$/month</th></tr>
+    <tr><th>Monthly revenue</th><td class="num"></td><td class="num">${money(Number(document.querySelector("[name=monthlyRevenue]").value) || 0)}</td></tr>
+    <tr><th>Less COGS — direct job costs</th><td class="num ${cogsCls}">${esc(m.cogsPct)}%${m.cogsFlag ? " ⚠️" : ""}</td><td class="num ${cogsCls}">−${money(Number(document.querySelector("[name=cogs]").value) || 0)}</td></tr>
+    <tr><th>Available to allocate</th><td class="num"></td><td class="num"><strong>${money(m.revenueAfterCogs)}</strong></td></tr>
+    <tr><th>Taxes</th><td class="num">${esc(m.taxesPct)}%</td><td class="num">${money(m.taxesAmt)}</td></tr>
+    <tr><th>Profit</th><td class="num">${esc(m.profitPct)}%</td><td class="num">${money(m.profitAmt)}</td></tr>
+    <tr><th>Owner's Pay (benchmark)</th><td class="num">${esc(m.ownerPayPct)}%</td><td class="num">${money(m.ownerPayTarget)}</td></tr>
+    <tr><th>Operating Expenses (remainder)</th><td class="num">${esc(m.opexPct)}%</td><td class="num">${money(m.opexTarget)}</td></tr>
+  </table>`;
+}
+
+initTool({
+  toolId: "profit-first-setup",
+  collect(form) {
+    const data = {};
+    for (const el of form.querySelectorAll("[name]")) if (el.name !== "email") data[el.name] = el.value;
+    return data;
+  },
+  renderMetrics(m) {
+    const bar = flowBar("💰 Where every dollar goes", [
+      { label: "Taxes", value: m.taxesAmt, cls: "fs-amber" },
+      { label: "Profit", value: m.profitAmt, cls: "fs-green" },
+      { label: "Owner's Pay", value: m.ownerPayTarget, cls: "fs-sage" },
+      { label: "Operating Expenses", value: m.opexTarget, cls: "fs-navy" },
+    ]);
+    return `
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Profit + taxes set aside every month</div>
+        <div class="big-number status-healthy">$<span id="setaside-num">0</span></div>
+        <div class="sub">at your target percentages</div>
+      </div>
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Your pay, benchmarked</div>
+        <div class="big-number">${money(m.ownerPayTarget)}</div>
+        <div class="sub">per month — a predictable draw, not leftovers</div>
+      </div>
+      <div class="card">${bar}${allocationTable(m)}</div>`;
+  },
+  renderReport(r) {
+    return `
+      <div class="card sp-7"><h2>🔍 Your allocation, read against reality</h2><p>${esc(r.readout)}</p></div>
+      <div class="card sp-5 tint-amber"><h2>🪜 Your starting point</h2><p>${esc(r.phase_plan)}</p></div>
+      <div class="card sp-6 tint-mint"><h2>🏦 Set up the accounts</h2>
+        <ol class="actions">${r.account_steps.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>
+      </div>
+      <div class="card sp-6 tint-sage"><h2>🔁 The transfer habit</h2><p>${esc(r.transfer_habit)}</p></div>
+      <div class="card tint-amber"><h2>🎯 First milestone</h2><p>${esc(r.first_milestone)}</p></div>
+      <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
+  },
+  onReady(_r, m) {
+    countUp(document.getElementById("setaside-num"), Math.round(m.setAsideMonthly));
+  },
+});
+document.querySelector(".pdf-btn").addEventListener("click", () => printReport("Profit First Setup — The CEO Profit Shift"));
+</script>
+</body>
+</html>

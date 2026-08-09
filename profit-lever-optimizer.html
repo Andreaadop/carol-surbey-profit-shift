@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profit Lever Optimizer — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <span class="step-tag">Step 4 of 8</span>
+  <h1>Profit Lever Optimizer</h1>
+  <p class="intro">There are four ways to increase profit without taking on more clients or working more hours: pricing, efficiency, client value, and cutting low-margin work. Most owners guess at which one matters — and pick wrong. Answer the questions below and this tool rates all four levers for your business, puts a dollar figure on each, and hands you a 30-day plan for the one that moves the needle most.</p>
+
+  <div id="form-error" hidden></div>
+  <div id="form-progress"></div>
+
+  <form id="tool-form" class="tool-form" novalidate>
+    <fieldset>
+      <legend>Business basics</legend>
+      <div class="field"><label for="monthlyRevenue">Monthly revenue ($)</label>
+        <input id="monthlyRevenue" name="monthlyRevenue" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="profitMargin">Profit margin, roughly (%, optional)</label>
+        <input id="profitMargin" name="profitMargin" type="number" min="-100" max="100" step="any"></div>
+      <div class="field"><label for="activeClients">Active clients (optional)</label>
+        <input id="activeClients" name="activeClients" type="number" min="0" step="1"></div>
+      <div class="field"><label for="gutFeeling">Gut check: doubling your profit feels like a…</label>
+        <select id="gutFeeling" name="gutFeeling">
+          <option value="not sure" selected>Not sure</option>
+          <option value="pricing">Pricing problem</option>
+          <option value="efficiency">Efficiency problem</option>
+          <option value="client retention">Client retention problem</option>
+          <option value="too much low-margin work">Too-much-low-margin-work problem</option>
+        </select></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lever 1 — Pricing</legend>
+      <div class="field"><label for="lastPriceRaise">When did you last raise your prices?</label>
+        <select id="lastPriceRaise" name="lastPriceRaise">
+          <option value="under 6 months">Under 6 months ago</option>
+          <option value="6-12 months">6–12 months ago</option>
+          <option value="1-2 years">1–2 years ago</option>
+          <option value="2+ years">2+ years ago</option>
+          <option value="never">Never</option>
+        </select></div>
+      <div class="field"><label for="pricingBasis">How did you set your current rates?</label>
+        <select id="pricingBasis" name="pricingBasis">
+          <option value="calculated from costs and target margin">Calculated from costs + target margin</option>
+          <option value="matched competitors">Matched what competitors charge</option>
+          <option value="gut feel">Gut feel</option>
+          <option value="grandfathered">Grandfathered — haven't revisited in years</option>
+        </select></div>
+      <div class="field"><label for="loseOnPrice">How often do you lose work on price?</label>
+        <select id="loseOnPrice" name="loseOnPrice">
+          <option value="often">Often</option>
+          <option value="sometimes">Sometimes</option>
+          <option value="rarely">Rarely</option>
+        </select></div>
+      <div class="field"><label for="pricingNote">Anything else about your pricing? (optional)</label>
+        <input id="pricingNote" name="pricingNote" maxlength="300"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lever 2 — Efficiency</legend>
+      <div class="field"><label for="hasSOPs">Do you have documented procedures (SOPs) for delivery?</label>
+        <select id="hasSOPs" name="hasSOPs">
+          <option value="documented">Yes — documented</option>
+          <option value="partial">Partially</option>
+          <option value="in my head">No — it's in my head</option>
+        </select></div>
+      <div class="field"><label for="ownerLowValueHours">Your hours per week on work someone cheaper could do (0 if none)</label>
+        <input id="ownerLowValueHours" name="ownerLowValueHours" type="number" min="0" step="any" value="0"></div>
+      <div class="field"><label for="efficiencyNote">Your most time-consuming service to deliver? (optional)</label>
+        <input id="efficiencyNote" name="efficiencyNote" maxlength="300"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lever 3 — Client value</legend>
+      <div class="field"><label for="repeatRevenuePct">Share of revenue from repeat clients (%, optional)</label>
+        <input id="repeatRevenuePct" name="repeatRevenuePct" type="number" min="0" max="100" step="any"></div>
+      <div class="field"><label for="recurringRevenue">Any recurring revenue — retainers, subscriptions, maintenance plans?</label>
+        <select id="recurringRevenue" name="recurringRevenue">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select></div>
+      <div class="field"><label for="clientValueNote">A service clients need repeatedly but don't know to ask for? (optional)</label>
+        <input id="clientValueNote" name="clientValueNote" maxlength="300"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lever 4 — Low-profit work</legend>
+      <div class="field"><label for="dreadedWork">Work that's always more effort than it's worth? (optional)</label>
+        <input id="dreadedWork" name="dreadedWork" maxlength="300"></div>
+      <div class="field"><label for="marginVariance">Across your last 10 jobs, how consistent were the margins?</label>
+        <select id="marginVariance" name="marginVariance">
+          <option value="no idea">No idea</option>
+          <option value="wide swings">Wide swings</option>
+          <option value="fairly consistent">Fairly consistent</option>
+        </select></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Unlock your report</legend>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+        <p class="hint">Your report appears right here on this page — and we'll email you a copy to keep.</p>
+      </div>
+    </fieldset>
+    <button class="btn" type="submit" data-label="Find my lever">Find my lever</button>
+    <p class="form-note">Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
+  </form>
+
+  <section id="report" class="report" hidden>
+    <div id="metrics"></div>
+    <div id="report-body"></div>
+    <button class="btn secondary pdf-btn" type="button">💾 Save report as PDF</button>
+    <div class="followup">
+      <h3>💬 Ask about your report</h3>
+      <p id="fu-counter"></p>
+      <div id="fu-thread"></div>
+      <div class="fu-row">
+        <input id="fu-input" type="text" maxlength="500" placeholder="e.g. How do I tell existing clients about a price increase?">
+        <button id="fu-send" class="btn">Ask</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script type="module">
+import { initTool, esc, money, countUp, printReport } from "./assets/js/tool-ui.js";
+import { initGate } from "./assets/js/member-gate.js";
+initGate();
+
+const OPP_CLS = { High: "status-healthy", Medium: "status-watch" };
+
+initTool({
+  toolId: "profit-lever-optimizer",
+  collect(form) {
+    const data = {};
+    for (const el of form.querySelectorAll("[name]")) if (el.name !== "email") data[el.name] = el.value;
+    return data;
+  },
+  renderMetrics(m) {
+    return `
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Your highest-impact lever</div>
+        <div class="big-number">${esc(m.recommendedLever)}</div>
+        <div class="sub">of the four profit levers</div>
+      </div>
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Worth an estimated</div>
+        <div class="big-number status-healthy">$<span id="lever-month">0</span></div>
+        <div class="sub">per month — ${money(m.annualizedImpact)} a year</div>
+      </div>`;
+  },
+  renderReport(r) {
+    const rows = r.levers.map((l) => `
+      <tr><td>${esc(l.lever)}</td>
+        <td><span class="${OPP_CLS[l.opportunity] ?? ""}">${esc(l.opportunity)}</span></td>
+        <td>${money(l.monthlyImpact)}/mo</td>
+        <td>${esc(l.rationale)}</td></tr>`).join("");
+    const plan = r.plan_30day.map((a) => `<li>${esc(a)}</li>`).join("");
+    return `
+      <div class="card sp-7"><h2>🎯 Why this lever</h2><p>${esc(r.reason)}</p></div>
+      <div class="card sp-5 tint-mint"><h2>⚙️ Your 30-day plan</h2><ol class="actions">${plan}</ol></div>
+      <div class="card"><h2>📊 All four levers, rated</h2>
+        <table class="metric-table"><tr><th>Lever</th><th>Opportunity</th><th>Est. impact</th><th>Why</th></tr>${rows}</table>
+      </div>
+      <div class="card tint-amber"><h2>📈 Your 30-day target</h2><p>${esc(r.target)}</p></div>
+      <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
+  },
+  onReady(_r, m) {
+    countUp(document.getElementById("lever-month"), Math.round(m.recommendedImpact));
+  },
+});
+document.querySelector(".pdf-btn").addEventListener("click", () => printReport("Profit Lever Optimizer — The CEO Profit Shift"));
+</script>
+</body>
+</html>

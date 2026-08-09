@@ -131,12 +131,161 @@ function cashLeakBody(data, m, r) {
   ].join("");
 }
 
+function leverBody(data, m, r) {
+  return [
+    bigNumber("Your highest-impact lever", m.recommendedLever, NAVY),
+    `<tr><td align="center" style="padding: 0 28px;">
+      <div style="font-size: 14px; color: ${GREY};">Worth an estimated <strong style="color:${STATUS_COLOR.healthy};">${money(m.recommendedImpact)}/mo</strong> — ${money(m.annualizedImpact)} a year.</div>
+    </td></tr>`,
+    section("All four levers, rated", table(r.levers.map((l) =>
+      metricRow(`${l.lever} — ${l.opportunity} opportunity`, `${money(l.monthlyImpact)}/mo`)).join(""))),
+    section("Why this lever", para(r.reason)),
+    section("Your 30-day plan", `<ol style="margin: 6px 0 0; padding-left: 20px;">${r.plan_30day.map((a) =>
+      `<li style="font-size: 15px; line-height: 1.6; color: ${GREY}; margin-bottom: 8px;">${esc(a)}</li>`).join("")}</ol>`),
+    section("Your 30-day target", para(r.target)),
+    section("", `<p style="margin:0; font-family: Georgia, serif; font-size: 17px; font-style: italic; color: ${NAVY};">${esc(r.closing)}</p>`),
+  ].join("");
+}
+
+function profitFirstBody(data, m, r) {
+  return [
+    bigNumber("Profit + taxes set aside every month", money(m.setAsideMonthly), STATUS_COLOR.healthy),
+    `<tr><td align="center" style="padding: 0 28px;">
+      <div style="font-size: 14px; color: ${GREY};">Your pay, benchmarked: <strong style="color:${NAVY};">${money(m.ownerPayTarget)}/mo</strong> — a predictable draw, not leftovers.</div>
+    </td></tr>`,
+    section("Your monthly allocation plan", table(
+      metricRow("Monthly revenue", money(data.monthlyRevenue)) +
+      metricRow(`Less COGS — direct job costs (${m.cogsPct}% of revenue)`, "−" + money(data.cogs), m.cogsFlag ? "watch" : undefined) +
+      metricRow("Available to allocate", money(m.revenueAfterCogs)) +
+      metricRow(`Taxes (${m.taxesPct}%)`, money(m.taxesAmt) + "/mo") +
+      metricRow(`Profit (${m.profitPct}%)`, money(m.profitAmt) + "/mo") +
+      metricRow("Owner's Pay (benchmark)", money(m.ownerPayTarget) + "/mo") +
+      metricRow("Operating Expenses (remainder)", money(m.opexTarget) + "/mo")
+    )),
+    section("Your allocation, read against reality", para(r.readout)),
+    section("Your starting point", para(r.phase_plan)),
+    section("Set up the accounts", `<ol style="margin: 6px 0 0; padding-left: 20px;">${r.account_steps.map((s) =>
+      `<li style="font-size: 15px; line-height: 1.6; color: ${GREY}; margin-bottom: 8px;">${esc(s)}</li>`).join("")}</ol>`),
+    section("The transfer habit", para(r.transfer_habit)),
+    section("First milestone", para(r.first_milestone)),
+    section("", `<p style="margin:0; font-family: Georgia, serif; font-size: 17px; font-style: italic; color: ${NAVY};">${esc(r.closing)}</p>`),
+  ].join("");
+}
+
+function forecastBody(data, m, r) {
+  const signed = (n) => (n < 0 ? "−" + money(Math.abs(n)) : "+" + money(n));
+  const netStatus = (n) => (n < 0 ? "critical" : "healthy");
+  return [
+    bigNumber("90-day net position", signed(m.netPosition), STATUS_COLOR[netStatus(m.netPosition)]),
+    `<tr><td align="center" style="padding: 0 28px;">
+      <div style="font-size: 14px; color: ${STATUS_COLOR[netStatus(m.tightestNet)]};">
+        Tightest month: <strong>Month ${esc(m.tightestMonth)} · ${esc(signed(m.tightestNet))}</strong>
+      </div>
+    </td></tr>`,
+    section("Your 90-day map", table(
+      m.months.map((mo, i) =>
+        metricRow(`Month ${i + 1} — in ${money(mo.inflow)}, out ${money(mo.outflow)}`, `net ${signed(mo.net)}`, netStatus(mo.net))
+      ).join("") +
+      metricRow(`Total — in ${money(m.totalIn)}, out ${money(m.totalOut)}`, `net ${signed(m.netPosition)}`, netStatus(m.netPosition))
+    )),
+    section("The pattern", para(r.pattern_read)),
+    section("Month by month", list(r.month_notes)),
+    section("Your cash buffer", table(
+      metricRow("Buffer target (1 month of fixed expenses)", money(m.bufferTarget)) +
+      metricRow("What you have set aside", money(m.currentBuffer)) +
+      metricRow("Gap to close", money(m.bufferGap), m.bufferGap > 0 ? "watch" : "healthy")
+    ) + para(r.buffer_plan)),
+    section("Stabilize it", list(r.actions)),
+    section("The weekly 5-minute check", para(r.weekly_review)),
+    section("", `<p style="margin:0; font-family: Georgia, serif; font-size: 17px; font-style: italic; color: ${NAVY};">${esc(r.closing)}</p>`),
+  ].join("");
+}
+
+function weeklyBody(data, m, r) {
+  const status = m.net < 0 ? "critical" : m.margin < 10 ? "watch" : "healthy";
+  return [
+    bigNumber("Net this week", money(m.net), STATUS_COLOR[status]),
+    `<tr><td align="center" style="padding: 0 28px;">
+      <div style="font-size: 13px; color: ${GREY_LIGHT};">${esc(data.period)} · running margin ${esc(m.margin)}%</div>
+    </td></tr>`,
+    section("The three numbers", table(
+      metricRow("Revenue in", money(data.revenueIn)) +
+      metricRow("Expenses out", money(data.expensesOut)) +
+      metricRow("Net this week", money(m.net), status) +
+      metricRow("Running margin", `${m.margin}%`, status)
+    )),
+    m.twoWeek ? section("Two-week average (payroll weeks read compressed)", table(
+      metricRow("Combined revenue", money(m.twoWeek.revenue)) +
+      metricRow("Combined expenses", money(m.twoWeek.expenses)) +
+      metricRow("Combined net", money(m.twoWeek.net), m.twoWeek.net < 0 ? "critical" : "healthy") +
+      metricRow("Combined margin", `${m.twoWeek.margin}%`)
+    )) : "",
+    section("The read", para(r.read)),
+    section("🚩 The flag", para(r.flag)),
+    section("🎯 One action", para(r.one_action)),
+    section("Your weekly benchmarks", table(
+      metricRow("Target weekly revenue", r.benchmarks.target_revenue) +
+      metricRow("Maximum weekly expenses", r.benchmarks.max_expenses) +
+      metricRow("Minimum weekly margin", r.benchmarks.min_margin)
+    )),
+    section("📅 Your weekly habit", para(r.habit_setup)),
+    section("", `<p style="margin:0; font-family: Georgia, serif; font-size: 17px; font-style: italic; color: ${NAVY};">${esc(r.closing)}</p>`),
+  ].join("");
+}
+
+function challengeBody(data, m, r) {
+  const VERDICT_COLOR = {
+    strong: STATUS_COLOR.healthy,
+    solid: STATUS_COLOR.healthy,
+    functional: STATUS_COLOR.watch,
+    challenging: STATUS_COLOR.critical,
+    difficult: STATUS_COLOR.critical,
+  };
+  const comparison = m.prior
+    ? section("Quarter over quarter", table(
+        metricRow("Prior quarter — net profit", money(m.prior.priorNet)) +
+        metricRow("Prior quarter — margin", `${m.prior.priorMargin}%`) +
+        metricRow("This quarter — net profit", money(m.netProfit)) +
+        metricRow("This quarter — margin", `${m.margin}%`) +
+        metricRow("Revenue change", `${m.prior.revenueChangePct >= 0 ? "+" : ""}${m.prior.revenueChangePct}%`) +
+        metricRow("Margin change", `${m.prior.marginChangePts >= 0 ? "+" : ""}${m.prior.marginChangePts} pts`)
+      ))
+    : section("Your baseline", para("No prior quarter to compare — this quarter becomes your baseline going forward."));
+  return [
+    bigNumber("Last quarter's margin", `${m.margin}%`, VERDICT_COLOR[m.verdict] ?? NAVY),
+    section("The quarter, read honestly", para(r.verdict_read)),
+    comparison,
+    section("The one goal", `<p style="margin:0; font-family: Georgia, serif; font-size: 17px; font-style: italic; color: ${NAVY};">${esc(r.goal)}</p>`),
+    section("Your three profit levers", r.levers.map((l, i) => `
+      <div style="border-left: 4px solid ${NAVY}; background: #f2f7f6; border-radius: 8px; padding: 10px 14px; margin: 8px 0;">
+        <div style="font-size: 15px; font-weight: bold; color: ${NAVY};">⚙️ Lever ${i + 1}: ${esc(l.name)}</div>
+        ${para(`Action — ${l.action}`)}
+        ${para(`Target — ${l.target}`)}
+        ${para(`Month 1 — ${l.month1}`)}
+      </div>`).join("")),
+    section("The cadence", para(r.cadence) + list([
+      `Every ${data.checkDay}: 5-minute CEO Profit Check`,
+      `At 45 days (${m.midDate}): mid-quarter P&L review — on track or course-correct`,
+      `At 90 days (${m.endDate}): run this review again`,
+    ])),
+    section("The obstacle, pre-decided", para(r.contingency)),
+    section("", `<p style="margin:0; font-family: Georgia, serif; font-size: 17px; font-style: italic; color: ${NAVY};">${esc(r.closing)}</p>`),
+  ].join("");
+}
+
+const BODIES = {
+  "profit-margin-check": pmcBody,
+  "monthly-dashboard": dashboardBody,
+  "cash-leak-audit": cashLeakBody,
+  "profit-lever-optimizer": leverBody,
+  "profit-first-setup": profitFirstBody,
+  "cash-flow-forecast": forecastBody,
+  "ceo-weekly-profit-check": weeklyBody,
+  "90-day-profit-challenge": challengeBody,
+};
+
 export function renderReportEmail(toolId, data, metrics, report) {
-  const body =
-    toolId === "profit-margin-check" ? pmcBody(data, metrics, report) :
-    toolId === "monthly-dashboard" ? dashboardBody(data, metrics, report) :
-    cashLeakBody(data, metrics, report);
-  return wrap(body);
+  return wrap((BODIES[toolId] ?? cashLeakBody)(data, metrics, report));
 }
 
 // Subjects reach header-like fields — strip control characters from any
@@ -163,5 +312,14 @@ export function renderMagicLinkEmail(link) {
 export function emailSubject(toolId, data, metrics) {
   if (toolId === "profit-margin-check") return `Your Profit Margin Check: ${metrics.margin}%`;
   if (toolId === "monthly-dashboard") return `Your Monthly Dashboard — ${headerSafe(data.month)}`;
+  if (toolId === "profit-lever-optimizer") return `Your Profit Lever: ${metrics.recommendedLever} — ${money(metrics.recommendedImpact)}/mo`;
+  if (toolId === "profit-first-setup") return `Your Profit First Setup: ${money(metrics.setAsideMonthly)}/mo to profit + taxes`;
+  if (toolId === "cash-flow-forecast") {
+    return metrics.shortfallMonths > 0
+      ? `Your 90-Day Cash Flow Forecast: Month ${metrics.tightestMonth} needs a plan`
+      : `Your 90-Day Cash Flow Forecast: ${money(metrics.netPosition)} ahead`;
+  }
+  if (toolId === "ceo-weekly-profit-check") return `Your Weekly Profit Check: ${money(metrics.net)} net, ${metrics.margin}% margin`;
+  if (toolId === "90-day-profit-challenge") return `Your 90-Day Profit Plan: ${metrics.margin}% margin quarter, reviewed`;
   return `Your Cash Leak Audit: ${money(metrics.totalMonthlyLeak)}/mo found`;
 }

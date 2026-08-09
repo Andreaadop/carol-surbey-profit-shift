@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cash Flow Forecast — The CEO Profit Shift</title>
+<link rel="icon" href="assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand.css">
+</head>
+<body>
+<header class="site-header">
+  <img src="assets/brand/logo.svg" alt="Carol Surbey — The Scalable CEO">
+  <a class="program" href="index.html">The CEO Profit Shift</a>
+</header>
+<main>
+  <span class="step-tag">Step 6 of 8</span>
+  <h1>Cash Flow Forecast</h1>
+  <p class="intro">A bank balance is not a forecast. This builds your 90-day cash flow map — what's coming in, what's going out, and when — so you see the gaps before they become crises. Estimates are fine; a rough forecast you actually look at beats a perfect one you never build.</p>
+
+  <div id="form-error" hidden></div>
+  <div id="form-progress"></div>
+
+  <form id="tool-form" class="tool-form" novalidate>
+    <fieldset>
+      <legend>Money coming in — next 90 days</legend>
+      <div class="field"><label for="confirmed1">Month 1 (next 30 days): confirmed revenue — already contracted or committed ($)</label>
+        <input id="confirmed1" name="confirmed1" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="expected1">Month 1: expected new work — your conservative pipeline floor ($)</label>
+        <input id="expected1" name="expected1" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="confirmed2">Month 2 (days 31–60): confirmed revenue ($)</label>
+        <input id="confirmed2" name="confirmed2" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="expected2">Month 2: expected new work ($)</label>
+        <input id="expected2" name="expected2" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="confirmed3">Month 3 (days 61–90): confirmed revenue ($)</label>
+        <input id="confirmed3" name="confirmed3" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="expected3">Month 3: expected new work ($)</label>
+        <input id="expected3" name="expected3" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Money going out</legend>
+      <div class="field"><label for="fixedMonthly">Fixed expenses — the same every month: payroll, rent, loans, insurance, subscriptions ($/month)</label>
+        <input id="fixedMonthly" name="fixedMonthly" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="variable1">Month 1: variable costs — costs that move with job volume: subcontractors, materials, fuel ($)</label>
+        <input id="variable1" name="variable1" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="variable2">Month 2: variable costs ($)</label>
+        <input id="variable2" name="variable2" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="variable3">Month 3: variable costs ($)</label>
+        <input id="variable3" name="variable3" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="oneTime1">Month 1: known one-time hits — equipment, tax payment, renewals ($ — 0 if none)</label>
+        <input id="oneTime1" name="oneTime1" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="oneTime2">Month 2: known one-time hits ($ — 0 if none)</label>
+        <input id="oneTime2" name="oneTime2" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="oneTime3">Month 3: known one-time hits ($ — 0 if none)</label>
+        <input id="oneTime3" name="oneTime3" type="number" min="0" step="any" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Where you stand</legend>
+      <div class="field"><label for="currentBuffer">Cash reserve beyond your operating account ($ — 0 if none)</label>
+        <input id="currentBuffer" name="currentBuffer" type="number" min="0" step="any" required></div>
+      <div class="field"><label for="pattern">Over the last 6 months, your revenue has been…</label>
+        <select id="pattern" name="pattern" required>
+          <option value="" disabled selected>Choose one</option>
+          <option value="predictable">Fairly predictable</option>
+          <option value="swings">Good months and terrible months</option>
+          <option value="unsure">Genuinely unsure</option>
+        </select></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>The context behind the numbers (optional — anything here sharpens the forecast)</legend>
+      <div class="field"><label for="seasonalNote">Any historically slow or strong months in the next 90 days?</label>
+        <textarea id="seasonalNote" name="seasonalNote" rows="2" maxlength="400"></textarea></div>
+      <div class="field"><label for="receivablesNote">Invoices sent but not yet collected — roughly how much, and how late do clients usually pay?</label>
+        <textarea id="receivablesNote" name="receivablesNote" rows="2" maxlength="400"></textarea></div>
+      <div class="field"><label for="worryNote">What's the cash moment you're most worried about?</label>
+        <textarea id="worryNote" name="worryNote" rows="2" maxlength="400"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Unlock your report</legend>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+        <p class="hint">Your report appears right here on this page — and we'll email you a copy to keep.</p>
+      </div>
+    </fieldset>
+    <button class="btn" type="submit" data-label="Map my next 90 days">Map my next 90 days</button>
+    <p class="form-note">Your numbers are used only to generate this report, and it shows up on this page instantly.</p>
+  </form>
+
+  <section id="report" class="report" hidden>
+    <div id="metrics"></div>
+    <div id="report-body"></div>
+    <button class="btn secondary pdf-btn" type="button">💾 Save report as PDF</button>
+    <div class="followup">
+      <h3>💬 Ask about your report</h3>
+      <p id="fu-counter"></p>
+      <div id="fu-thread"></div>
+      <div class="fu-row">
+        <input id="fu-input" type="text" maxlength="500" placeholder="e.g. How do I get deposits without losing jobs?">
+        <button id="fu-send" class="btn">Ask</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  The CEO Profit Shift is a program by Carol Surbey, professionally trained business coach and founder of The Scalable CEO ·
+  <a href="https://carolsurbey.com" target="_blank" rel="noopener">carolsurbey.com</a>
+</footer>
+
+<script type="module">
+import { initTool, esc, money, countUp, printReport } from "./assets/js/tool-ui.js";
+import { initGate } from "./assets/js/member-gate.js";
+initGate();
+
+const signedMoney = (n) => (n < 0 ? "−" + money(Math.abs(n)) : money(n));
+const netCls = (n) => (n < 0 ? "status-critical" : "status-healthy");
+
+initTool({
+  toolId: "cash-flow-forecast",
+  collect(form) {
+    const data = {};
+    for (const el of form.querySelectorAll("[name]")) if (el.name !== "email") data[el.name] = el.value;
+    return data;
+  },
+  renderMetrics(m) {
+    const tightest = m.tightestNet < 0
+      ? `Month ${esc(m.tightestMonth)} · <span class="status-critical">−${money(Math.abs(m.tightestNet))}</span>`
+      : `Month ${esc(m.tightestMonth)} · <span class="status-healthy">+${money(m.tightestNet)}</span>`;
+    const tightestSub = m.tightestNet < 0
+      ? "a warning you now have time to act on"
+      : "even your tightest month comes out ahead";
+    const rows = m.months.map((mo, i) => `
+      <tr><th>Month ${i + 1}</th>
+        <td class="num">${money(mo.inflow)}</td>
+        <td class="num">${money(mo.outflow)}</td>
+        <td class="num ${netCls(mo.net)}">${esc(signedMoney(mo.net))}</td></tr>`).join("");
+    return `
+      <div class="card sp-6 hero-stat">
+        <div class="sub">90-day net position</div>
+        <div class="big-number ${netCls(m.netPosition)}">${m.netPosition < 0 ? "−" : ""}$<span id="net-pos">0</span></div>
+        <div class="sub">everything in, minus everything out</div>
+      </div>
+      <div class="card sp-6 hero-stat">
+        <div class="sub">Tightest month</div>
+        <div class="big-number">${tightest}</div>
+        <div class="sub">${tightestSub}</div>
+      </div>
+      <div class="card">
+        <table class="metric-table">
+          <tr><th></th><th>In</th><th>Out</th><th>Net</th></tr>
+          ${rows}
+          <tr><th>Total</th>
+            <td class="num">${money(m.totalIn)}</td>
+            <td class="num">${money(m.totalOut)}</td>
+            <td class="num ${netCls(m.netPosition)}">${esc(signedMoney(m.netPosition))}</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <p class="flow-note" style="margin:0">🛟 Buffer target ${money(m.bufferTarget)} (one month of fixed expenses) · you have ${money(m.currentBuffer)} · gap ${money(m.bufferGap)}</p>
+      </div>`;
+  },
+  renderReport(r) {
+    return `
+      <div class="card sp-7"><h2>🔍 The pattern</h2><p>${esc(r.pattern_read)}</p></div>
+      <div class="card sp-5"><h2>🗓️ Month by month</h2>
+        <ul class="actions">${r.month_notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
+      </div>
+      <div class="card sp-6 tint-amber"><h2>🛟 Your cash buffer</h2><p>${esc(r.buffer_plan)}</p></div>
+      <div class="card sp-6 tint-mint"><h2>⚡ Stabilize it</h2>
+        <ol class="actions">${r.actions.map((a) => `<li>${esc(a)}</li>`).join("")}</ol>
+      </div>
+      <div class="card tint-sage"><h2>📅 The weekly 5-minute check</h2><p>${esc(r.weekly_review)}</p></div>
+      <div class="card tint-navy"><p class="closing">${esc(r.closing)}</p></div>`;
+  },
+  onReady(_r, m) {
+    countUp(document.getElementById("net-pos"), Math.abs(Math.round(m.netPosition)));
+  },
+});
+document.querySelector(".pdf-btn").addEventListener("click", () => printReport("Cash Flow Forecast — The CEO Profit Shift"));
+</script>
+</body>
+</html>
